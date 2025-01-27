@@ -40,6 +40,6 @@ mv ~/.cache/nvim
   - find files: fd
 
 1. Clone the git repository to the .config folder
-   using this command 'git clone https://github.com/Thrilok28021996/nvim.git ~/.config/nvim'
+   using this command 'git clone https://github.com/Thrilok28021996/personal_nvim.git ~/.config/nvim'
 2. Then run the nvim command in the terminal
 3. It will download all the plugins for the neovim setup
