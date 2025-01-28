@@ -6,56 +6,57 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 -- For conciseness
-local opts = { noremap = true, silent = true }
 local map = vim.keymap.set
+
 -- Disable the spacebar key's default behavior in Normal and Visual modes
 map({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
 -- clear highlights
-map('n', '<Esc>', ':noh<CR>', opts)
+map('n', '<Esc>', ':noh<CR>', { noremap = true, silent = true, desc = 'Clear highlights' })
 
 -- save file
-map('n', '<C-s>', '<cmd> w <CR>', opts)
+map('n', '<C-s>', '<cmd> w <CR>', { noremap = true, silent = true, desc = 'Save the File' })
 -- -- Comment
-map('n', '<C-/>', 'gcc', { desc = 'toggle comment', remap = true })
-map('v', '<C-/>', 'gc', { desc = 'toggle comment', remap = true })
+map('n', '<C-/>', 'gcc', { desc = 'toggle comment', remap = true, desc = 'Comment the lines' })
+map('v', '<C-/>', 'gc', { desc = 'toggle comment', remap = true, desc = 'Comment the lines' })
 -- save file without auto-formatting
--- [[ map('n', '<leader>sn', '<cmd>noautocmd w <CR>', opts) ]]
+-- [[ map('n', '<leader>sn', '<cmd>noautocmd w <CR>', {noremap=true,silent=true}) ]]
 
 -- quit file
-map('n', '<C-q>', '<cmd> q <CR>', opts)
+map('n', '<C-q>', '<cmd> q <CR>', { noremap = true, silent = true, desc = 'Quit the IDE' })
 
 -- delete single character without copying into register
-map('n', 'x', '"_x', opts)
+map('n', 'x', '"_x', { noremap = true, silent = true, desc = 'Delete single character' })
 
 -- Resize with arrows
-map('n', '<Up>', ':resize -2<CR>', opts)
-map('n', '<Down>', ':resize +2<CR>', opts)
-map('n', '<Left>', ':vertical resize -2<CR>', opts)
-map('n', '<Right>', ':vertical resize +2<CR>', opts)
+-- map('n', '<Up>', ':resize -2<CR>', { noremap = true, silent = true, desc = 'Save the File' })
+-- map('n', '<Down>', ':resize +2<CR>', { noremap = true, silent = true, desc = 'Save the File' })
+-- map('n', '<Left>', ':vertical resize -2<CR>', { noremap = true, silent = true, desc = 'Save the File' })
+-- map('n', '<Right>', ':vertical resize +2<CR>', { noremap = true, silent = true, desc = 'Save the File' })
 
 -- Navigate buffers
-map('n', '<Tab>', ':bnext<CR>', opts)
-map('n', '<S-Tab>', ':bprevious<CR>', opts)
+map('n', '<Tab>', '<CMD>bnext<CR>', { noremap = true, silent = true, desc = 'Go to next Tab' })
+map('n', '<S-Tab>', '<CMD>bprevious<CR>', { noremap = true, silent = true, desc = 'Go to previous tab' })
+map('n', '<S-c>', '<CMD>bdel<CR>', { noremap = true, silent = true, desc = 'Close the current buffer' })
 
 -- window management
-map('n', '<leader>v', '<C-w>v', opts) -- split window vertically
-map('n', '<leader>h', '<C-w>s', opts) -- split window horizontally
-map('n', '<leader>we', '<C-w>=', opts) -- make split windows equal width & height
-map('n', '<leader>wc', ':close<CR>', opts) -- close current split window
+map('n', '<leader>v', '<C-w>v', { noremap = true, silent = true, desc = 'split window vertically' })
+map('n', '<leader>h', '<C-w>s', { noremap = true, silent = true, desc = 'split window horizontally' })
+map('n', '<leader>we', '<C-w>=', { noremap = true, silent = true, desc = 'make split windows equal width & height' })
+map('n', '<leader>wc', '<CMD>close<CR>', { noremap = true, silent = true, desc = 'close current split window' })
 
 -- Navigate between splits
-map('n', '<C-k>', ':wincmd k<CR>', opts)
-map('n', '<C-j>', ':wincmd j<CR>', opts)
-map('n', '<C-h>', ':wincmd h<CR>', opts)
-map('n', '<C-l>', ':wincmd l<CR>', opts)
+map('n', '<C-k>', '<CMD>wincmd k<CR>', { noremap = true, silent = true, desc = 'Go to UP Window' })
+map('n', '<C-j>', '<CMD>wincmd j<CR>', { noremap = true, silent = true, desc = 'GO to Down Window' })
+map('n', '<C-h>', '<CMD>wincmd h<CR>', { noremap = true, silent = true, desc = 'Go to Left Window' })
+map('n', '<C-l>', '<CMD>wincmd l<CR>', { noremap = true, silent = true, desc = 'Go to Right Window' })
 
 -- Stay in indent mode
-map('v', '<', '<gv', opts)
-map('v', '>', '>gv', opts)
+map('v', '<', '<gv', { noremap = true, silent = true, desc = 'Left Indent' })
+map('v', '>', '>gv', { noremap = true, silent = true, desc = 'Right Indent' })
 
 -- Keep last yanked when pasting
-map('v', 'p', '"_dP', opts)
+map('v', 'p', '"_dP', { noremap = true, silent = true, desc = 'Paste the yanked content' })
 
 -- Search and replace
 map('n', '<leader>sr', [[:%s///gc<Left><Left><Left>]], { desc = 'Prompted search and replace with confirmation' })
@@ -65,6 +66,16 @@ map({ 'n', 'v' }, '<leader>y', [["+y]])
 map('n', '<leader>Y', [["+Y]])
 
 -- Map Ctrl+a to select all in normal mode
-map('n', '<C-a>', 'ggVG', { noremap = true, silent = true })
-
+map('n', '<C-a>', 'ggVG', { noremap = true, silent = true, desc = 'Select the All the content of the file' })
+-- Lazy
+map('n', '<leader>l', '<CMD>Lazy<CR>', { desc = 'Open Lazy' })
+-- File Explorer
 map('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+
+-- Fuzzy Finding
+map('n', '<leader>ff', function()
+  MiniPick.builtin.files()
+end, { desc = 'Find Files' })
+map('n', '<leader>fg', function()
+  MiniPick.builtin.grep_live()
+end, { desc = 'Find the word' })

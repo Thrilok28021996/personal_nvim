@@ -12,11 +12,19 @@ end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 -- NOTE: Here is where you install your plugins.
-require('lazy').setup ({
-	require 'plugins.fileexplorer',
-	require 'plugins.colorscheme',
-	require 'plugins.which-key',
-	-- require 'plugins.autoformat',
-	require 'plugins.terminal',
-	require 'plugins.autocompletion',
-})
+require('lazy').setup {
+  require 'plugins.fileexplorer',
+  require 'plugins.colorscheme',
+  require 'plugins.which-key',
+  require 'plugins.autoformat',
+  require 'plugins.terminal',
+  require 'plugins.autocompletion',
+  require 'plugins.language',
+  require 'plugins.linting',
+  require 'plugins.mason',
+  require 'plugins.misc',
+  require 'plugins.todo-comments',
+  require 'plugins.noice',
+  require 'plugins.git-signs',
+  require 'plugins.lazygit',
+}
