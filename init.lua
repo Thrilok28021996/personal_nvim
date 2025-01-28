@@ -27,4 +27,10 @@ require('lazy').setup {
   require 'plugins.noice',
   require 'plugins.git-signs',
   require 'plugins.lazygit',
+
+  -- INFO: Note Making Plugins.
+  require 'notemd.obsidian',
+  require 'notemd.markdown-preview',
+  require 'notemd.img-clip',
+  require 'notemd.rendering-markdown',
 }
