@@ -73,9 +73,6 @@ map('n', '<leader>l', '<CMD>Lazy<CR>', { desc = 'Open Lazy' })
 map('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
 
 -- Fuzzy Finding
-map('n', '<leader>ff', function()
-  MiniPick.builtin.files()
-end, { desc = 'Find Files' })
-map('n', '<leader>fg', function()
-  MiniPick.builtin.grep_live()
-end, { desc = 'Find the word' })
+map('n', '<leader>ff', '<CMD>FzfLua files<CR>', { desc = 'Find Files' })
+map('n', '<leader>fw', '<CMD>FzfLua live_grep<CR>', { desc = 'Find the word' })
+map('n', '<leader>fb', '<CMD>FzfLua buffers<CR>', { desc = 'Find the buffers' })
