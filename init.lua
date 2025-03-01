@@ -40,7 +40,5 @@ require('lazy').setup {
   require 'notemd.img-clip',
   require 'notemd.rendering-markdown',
 
-  -- INFO: Jupyter
-  require 'jupyter.jupynium',
-  require 'jupyter.jupytext',
+
 }

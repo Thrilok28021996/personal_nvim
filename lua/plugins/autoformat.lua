@@ -19,7 +19,8 @@ return { -- Autoformat
         markdown = { 'prettier' },
         -- graphql = { "prettier" },
         lua = { 'stylua' },
-        python = { 'isort', 'black', 'ruff_format' },
+        -- python = { 'isort', 'black', 'ruff_format' },
+        python = { 'isort', 'ruff_format' },
       },
       format_on_save = {
         -- These options will be passed to conform.format()

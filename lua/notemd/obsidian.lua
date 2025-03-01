@@ -21,7 +21,7 @@ return {
     workspaces = {
       {
         name = 'personal',
-        path = '~/Documents/personal',
+        path = vim.fn.getcwd(),
       },
       -- {
       --   name = 'work',
