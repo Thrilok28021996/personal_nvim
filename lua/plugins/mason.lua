@@ -28,6 +28,7 @@ return {
         'pylint', -- python linter
         -- "eslint_d", -- js linter
         'ruff', --python formatter & linter
+        'pyright', -- Python Language server
       },
     }
   end,

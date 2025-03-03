@@ -20,7 +20,7 @@ return { -- Autoformat
         -- graphql = { "prettier" },
         lua = { 'stylua' },
         -- python = { 'isort', 'black', 'ruff_format' },
-        python = { 'isort', 'ruff_format' },
+        python = { 'isort', 'black', 'ruff' },
       },
       format_on_save = {
         -- These options will be passed to conform.format()
