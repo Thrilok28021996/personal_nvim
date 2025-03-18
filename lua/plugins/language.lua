@@ -45,7 +45,7 @@ return {
             typeCheckingMode = 'basic', -- Adjust as needed ("off", "basic", "strict")
             autoSearchPaths = true,
             useLibraryCodeForTypes = true,
-            diagnosticMode = 'workspace',
+            diagnosticMode = 'openFilesOnly',
           },
         },
       },
