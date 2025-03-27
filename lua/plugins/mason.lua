@@ -3,6 +3,7 @@ return {
   dependencies = {
     'WhoIsSethDaniel/mason-tool-installer.nvim',
   },
+  event = 'VeryLazy',
   config = function()
     local mason = require 'mason'
 
