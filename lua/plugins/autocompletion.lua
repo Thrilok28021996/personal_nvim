@@ -5,7 +5,6 @@ return {
 
   -- use a release tag to download pre-built binaries
   version = '*',
-  lazy = true,
 
   ---@module 'blink.cmp'
   ---@type blink.cmp.Config
