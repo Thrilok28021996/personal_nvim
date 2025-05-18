@@ -52,11 +52,19 @@ return {
         return ' ' .. str
       end,
     }
-
+    -- Filename component: Shows filename, status, and path level with symbols and color
     local filename = {
       'filename',
       file_status = true, -- displays file status (readonly status, modified status)
       path = 0, -- 0 = just filename, 1 = relative path, 2 = absolute path
+      symbols = {
+        modified = '  ', -- Custom modified symbol with padding
+        readonly = '  ', -- Custom readonly symbol with padding
+        unnamed = '[No Name]', -- Custom unnamed symbol
+        newfile = '[New]', -- Custom newfile symbol
+      },
+      -- Add a subtle color to the filename itself
+      color = { fg = colors.cyan },
     }
 
     local hide_in_width = function()
@@ -68,7 +76,7 @@ return {
       sources = { 'nvim_diagnostic' },
       sections = { 'error', 'warn' },
       symbols = { error = ' ', warn = ' ', info = ' ', hint = ' ' },
-      colored = false,
+      colored = true,
       update_in_insert = false,
       always_visible = false,
       cond = hide_in_width,
@@ -76,7 +84,7 @@ return {
 
     local diff = {
       'diff',
-      colored = false,
+      colored = true,
       symbols = { added = ' ', modified = ' ', removed = ' ' }, -- changes diff symbols
       cond = hide_in_width,
     }
@@ -87,7 +95,7 @@ return {
         theme = themes[env_var_nvim_theme], -- Set theme based on environment variable
         -- Some useful glyphs:
         -- https://www.nerdfonts.com/cheat-sheet
-        --        
+        --          
         section_separators = { left = '', right = '' },
         component_separators = { left = '', right = '' },
         disabled_filetypes = { 'alpha', 'neo-tree' },
@@ -99,7 +107,7 @@ return {
         lualine_c = { filename },
         lualine_x = { diagnostics, diff, { 'encoding', cond = hide_in_width }, { 'filetype', cond = hide_in_width } },
         lualine_y = { 'location' },
-        lualine_z = { 'progress' },
+        lualine_z = {},
       },
       inactive_sections = {
         lualine_a = {},

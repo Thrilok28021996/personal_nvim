@@ -20,10 +20,8 @@ require('lazy').setup {
   require 'plugins.terminal',
   require 'plugins.autocompletion',
   require 'plugins.language',
-  -- require 'plugins.linting',
   require 'plugins.mason',
-  -- require 'plugins.misc',
-  require 'plugins.iron',
+
   require 'plugins.indent-blankline',
   require 'plugins.bufferline',
   require 'plugins.autopairs',
@@ -33,10 +31,8 @@ require('lazy').setup {
   require 'plugins.noice',
   require 'plugins.git-signs',
   require 'plugins.lazygit',
-
-  -- INFO: Note Making Plugins.
-  require 'notemd.obsidian',
-  require 'notemd.markdown-preview',
-  require 'notemd.img-clip',
-  require 'notemd.rendering-markdown',
+  require 'plugins.org-mode',
+  require 'plugins.org-roam',
+  require 'plugins.org-bullets',
+  require 'plugins.smear',
 }
