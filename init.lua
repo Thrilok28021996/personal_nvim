@@ -35,4 +35,6 @@ require('lazy').setup {
   require 'plugins.org-roam',
   require 'plugins.org-bullets',
   require 'plugins.smear',
+  require 'plugins.markdown',
+  require 'plugins.markdown-extras',
 }
