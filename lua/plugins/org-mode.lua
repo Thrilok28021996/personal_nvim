@@ -75,9 +75,9 @@ return {
       org_tags_column = 80,
 
       -- Priorities
-      org_priority_highest = 'HIGH',
-      org_priority_lowest = 'LOW',
-      org_priority_default = 'MEDIUM',
+      org_priority_highest = 'A',
+      org_priority_lowest = 'C',
+      org_priority_default = 'B',
     }
 
     -- NOTE: If you are using nvim-treesitter with ~ensure_installed = "all"~ option
