@@ -1,3 +1,13 @@
+<<<<<<< HEAD
+-- NOTE: bufferline.nvim removed - using built-in buffer management
+-- All buffer functionality replaced with native Vim commands:
+-- - :ls or :buffers to list buffers
+-- - :b[uffer] {name/number} to switch
+-- - :bd[elete] to close buffers
+-- - Tab/S-Tab navigation in keymaps.lua
+-- Benefits: Faster startup, learn native buffer commands, no visual clutter
+return {}
+=======
 return {
   'akinsho/bufferline.nvim',
   dependencies = {
@@ -65,3 +75,4 @@ return {
     }
   end,
 }
+>>>>>>> refs/remotes/origin/main

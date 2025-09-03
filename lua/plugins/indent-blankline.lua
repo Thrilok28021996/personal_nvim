@@ -1,28 +1,6 @@
-return {
-  'lukas-reineke/indent-blankline.nvim',
-  main = 'ibl',
-  opts = {
-    indent = {
-      char = '▏',
-    },
-    scope = {
-      show_start = false,
-      show_end = false,
-      show_exact_scope = false,
-    },
-    exclude = {
-      filetypes = {
-        'help',
-        'startify',
-        'dashboard',
-        'packer',
-        'neogitstatus',
-        'NvimTree',
-        'Trouble',
-      },
-    },
-  },
-}
+-- NOTE: indent-blankline.nvim removed - using built-in listchars in options.lua
+-- Built-in listchars provide basic indentation guides without plugin overhead
+return {}
 
 -- {
 --     'lukas-reineke/indent-blankline.nvim',

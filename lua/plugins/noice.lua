@@ -1,3 +1,13 @@
+<<<<<<< HEAD
+-- NOTE: noice.nvim removed - using default Neovim UI
+-- Built-in alternatives provide all essential functionality:
+-- - Default command line and messages work perfectly
+-- - Native LSP hover and signature help
+-- - Built-in completion popupmenu
+-- - :messages to view message history
+-- Benefits: Faster startup, more stable, learn default Neovim interface
+return {}
+=======
 -- lazy.nvim
 return {
   'folke/noice.nvim',
@@ -21,3 +31,4 @@ return {
     }
   end,
 }
+>>>>>>> refs/remotes/origin/main

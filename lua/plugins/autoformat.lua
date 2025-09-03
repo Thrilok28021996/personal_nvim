@@ -1,26 +1,34 @@
 return { -- Autoformat
   'stevearc/conform.nvim',
   event = { 'BufReadPre', 'BufNewFile' },
-  lazy = false,
   config = function()
     require('conform').setup {
       formatters_by_ft = {
+        -- JavaScript/TypeScript
+        javascript = { 'prettier' },
+        typescript = { 'prettier' },
+        javascriptreact = { 'prettier' },
+        typescriptreact = { 'prettier' },
 
-        -- Conform will run multiple formatters sequentially
-        -- javascript = { "prettier" },
-        -- typescript = { "prettier" },
-        -- javascriptreact = { "prettier" },
-        -- typescriptreact = { "prettier" },
-        -- svelte = { "prettier" },
-        -- css = { "prettier" },
-        -- html = { "prettier" },
-        -- json = { "prettier" },
-        -- yaml = { "prettier" },
+        -- Web Technologies
+        html = { 'prettier' },
+        css = { 'prettier' },
+        scss = { 'prettier' },
+
+        -- Configuration Files
+        json = { 'prettier' },
+        yaml = { 'prettier' },
+
+        -- Documentation
         markdown = { 'prettier' },
-        -- graphql = { "prettier" },
+
+        -- Programming Languages
         lua = { 'stylua' },
-        -- python = { 'isort', 'black', 'ruff_format' },
-        python = { 'isort', 'black', 'ruff' },
+        python = { 'isort', 'black', 'ruff_format' },
+
+        -- Shell Scripting
+        bash = { 'shfmt' },
+        sh = { 'shfmt' },
       },
       format_on_save = {
         -- These options will be passed to conform.format()
