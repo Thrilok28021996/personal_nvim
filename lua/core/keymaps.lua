@@ -15,21 +15,21 @@ map({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true, desc = 'Disabled (leader 
 map('n', '<Esc>', ':noh<CR>', { noremap = true, silent = true, desc = 'Clear highlights' })
 
 -- save file
-map('n', '<C-s>', '<cmd> w <CR>', { noremap = true, silent = true, desc = 'Save the File' })
+map('n', '<C-s>', '<cmd> w <CR>', { noremap = true, silent = true, desc = 'Save file' })
 -- Comment
-map('n', '<C-/>', 'gcc', { desc = 'Comment the lines', remap = true })
-map('v', '<C-/>', 'gc', { desc = 'Comment the lines', remap = true })
+map('n', '<C-/>', 'gcc', { desc = 'Toggle comment line', remap = true })
+map('v', '<C-/>', 'gc', { desc = 'Toggle comment selection', remap = true })
 
 -- quit file
-map('n', '<C-q>', '<cmd> q <CR>', { noremap = true, silent = true, desc = 'Quit the IDE' })
+map('n', '<C-q>', '<cmd> q <CR>', { noremap = true, silent = true, desc = 'Quit' })
 
 -- delete single character without copying into register
 map('n', 'x', '"_x', { noremap = true, silent = true, desc = 'Delete single character' })
 
--- Navigate buffers
-map('n', '<Tab>', '<CMD>bnext<CR>', { noremap = true, silent = true, desc = 'Go to next Tab' })
-map('n', '<S-Tab>', '<CMD>bprevious<CR>', { noremap = true, silent = true, desc = 'Go to previous tab' })
-map('n', '<leader>tx', '<CMD>bdel<CR>', { remap = true, silent = true, desc = 'Close the current buffer' })
+-- Navigate buffers (primary navigation)
+map('n', '<Tab>', '<CMD>bnext<CR>', { noremap = true, silent = true, desc = 'Next buffer' })
+map('n', '<S-Tab>', '<CMD>bprevious<CR>', { noremap = true, silent = true, desc = 'Previous buffer' })
+-- Use <leader>bd for buffer deletion (defined in buffer management section)
 
 -- Built-in buffer navigation (pure built-in commands)
 map('n', '<leader>1', '<CMD>1buffer<CR>', { desc = 'Go to buffer 1' })
@@ -46,8 +46,7 @@ map('n', '<leader>9', '<CMD>9buffer<CR>', { desc = 'Go to buffer 9' })
 map('n', '<leader>bb', ':<C-u>buffer ', { desc = 'Go to buffer (type name/number)' })
 map('n', '<leader>bd', '<CMD>bdelete<CR>', { desc = 'Delete current buffer' })
 map('n', '<leader>bo', '<CMD>%bdelete|edit#<CR>', { desc = 'Close all other buffers' })
-map('n', '<leader>bn', '<CMD>bnext<CR>', { desc = 'Next buffer' })
-map('n', '<leader>bp', '<CMD>bprevious<CR>', { desc = 'Previous buffer' })
+-- Removed redundant bn/bp - use Tab/S-Tab for buffer navigation instead
 
 -- NOTE: Terminal mapping consolidated below at line 338
 
@@ -67,10 +66,10 @@ map('n', '<leader>wx', '<C-w>x', { desc = 'Exchange windows' })
 -- Use <C-w>+/- for height, <C-w></>  for width, <C-w>H/J/K/L for movement natively
 
 -- Only essential window navigation shortcuts (others use native <C-w> commands)
-map('n', '<C-k>', '<C-w>k', { desc = 'Go to UP Window' })
-map('n', '<C-j>', '<C-w>j', { desc = 'Go to Down Window' })
-map('n', '<C-h>', '<C-w>h', { desc = 'Go to Left Window' })
-map('n', '<C-l>', '<C-w>l', { desc = 'Go to Right Window' })
+map('n', '<C-k>', '<C-w>k', { desc = 'Move to upper window' })
+map('n', '<C-j>', '<C-w>j', { desc = 'Move to lower window' })
+map('n', '<C-h>', '<C-w>h', { desc = 'Move to left window' })
+map('n', '<C-l>', '<C-w>l', { desc = 'Move to right window' })
 
 -- Stay in indent mode
 map('v', '<', '<gv', { noremap = true, silent = true, desc = 'Left Indent' })
@@ -144,10 +143,10 @@ map('n', '<leader>lz', '<CMD>Lazy<CR>', { desc = 'Open Lazy (plugin manager)' })
 -- Git operations
 map('n', '<leader>gg', '<CMD>LazyGit<CR>', { desc = 'Open LazyGit' })
 
--- Fuzzy Finding
-map('n', '<leader>ff', '<CMD>FzfLua files<CR>', { desc = 'Find Files' })
-map('n', '<leader>fw', '<CMD>FzfLua live_grep<CR>', { desc = 'Find the word' })
-map('n', '<leader>fb', '<CMD>FzfLua buffers<CR>', { desc = 'Find the buffers' })
+-- Built-in file operations (replaces FzfLua)
+map('n', '<leader>ff', '<CMD>find **/*<Left><Left><Left><Left>', { desc = 'Find Files (:find **)' })
+map('n', '<leader>fw', '<CMD>grep -r "" .<Left><Left><Left>', { desc = 'Find word (:grep)' })
+map('n', '<leader>fb', '<CMD>ls<CR>:b<Space>', { desc = 'Find buffers (:ls then :b)' })
 
 -- Terminal keymaps (using built-in terminal)
 map('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
@@ -158,23 +157,3 @@ map('n', '<leader>eT', '<CMD>vsplit | terminal<CR>', { desc = 'Open terminal in 
 map('n', '-', '<CMD>Oil<CR>', { desc = 'Open file explorer' })
 -- map('n', '<leader>fE', '<CMD>vsplit | Oil<CR>', { desc = 'Open file explorer in vertical split' })
 
--- Org-Mode keymaps
-map('n', '<leader>oc', '<cmd>lua require("orgmode").action("capture.prompt")<CR>', { desc = 'Org Capture' })
-map('n', '<leader>ot', '<cmd>lua require("orgmode").action("capture.refile", {key = "t"})<CR>', { desc = 'Capture Task' })
-map('n', '<leader>on', '<cmd>lua require("orgmode").action("capture.refile", {key = "n"})<CR>', { desc = 'Capture Note' })
-map('n', '<leader>oa', '<cmd>lua require("orgmode").action("agenda.prompt")<CR>', { desc = 'Org Agenda' })
-map('n', '<leader>ol', '<cmd>lua require("orgmode").action("agenda.agenda")<CR>', { desc = 'Agenda List' })
-
--- Org-Roam Integration
-map('n', '<leader>rf', '<cmd>lua require("org-roam").capture_node()<CR>', { desc = 'Create Roam Note' })
-map('n', '<leader>rn', '<cmd>lua require("org-roam").find_node()<CR>', { desc = 'Find Roam Node' })
-
--- Markdown/Obsidian keymaps
-map('n', '<leader>mn', '<cmd>ObsidianNew<CR>', { desc = 'New Obsidian Note' })
-map('n', '<leader>mf', '<cmd>ObsidianQuickSwitch<CR>', { desc = 'Quick Switch Notes' })
-map('n', '<leader>ms', '<cmd>ObsidianSearch<CR>', { desc = 'Search Obsidian' })
-map('n', '<leader>md', '<cmd>ObsidianToday<CR>', { desc = "Today's Daily Note" })
-map('v', '<leader>ml', '<cmd>ObsidianLink<CR>', { desc = 'Link Selection' })
-
--- Checkbox toggle
-map('n', '<leader>x', '<cmd>lua require("obsidian").util.toggle_checkbox()<CR>', { desc = 'Toggle Checkbox' })

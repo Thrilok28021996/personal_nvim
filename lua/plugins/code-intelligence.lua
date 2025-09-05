@@ -92,8 +92,8 @@ return {
           ["<C-v>"] = "actions.jump_vsplit",
           ["<C-s>"] = "actions.jump_split",
           ["p"] = "actions.scroll",
-          ["<M-j>"] = "actions.down_and_scroll",
-          ["<M-k>"] = "actions.up_and_scroll",
+          ["<C-M-j>"] = "actions.down_and_scroll",
+          ["<C-M-k>"] = "actions.up_and_scroll",
           ["{"] = "actions.prev",
           ["}"] = "actions.next",
           ["[["] = "actions.prev_up",
@@ -147,8 +147,8 @@ return {
         link_tree_to_folds = true,
         nerd_font = "auto",
         on_attach = function(bufnr)
-          vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
-          vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
+          vim.keymap.set("n", "[a", "<cmd>AerialPrev<CR>", { buffer = bufnr, desc = "Previous aerial symbol" })
+          vim.keymap.set("n", "]a", "<cmd>AerialNext<CR>", { buffer = bufnr, desc = "Next aerial symbol" })
         end,
         on_first_symbols = function(bufnr) end,
         open_automatic = false,

@@ -2,7 +2,7 @@ return {
   -- Core markdown support
   {
     'MeanderingProgrammer/render-markdown.nvim',
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
     ft = { 'markdown', 'Avante' },
     config = function()
       require('render-markdown').setup {
@@ -38,6 +38,11 @@ return {
             icon = '󰱒 ',
             highlight = 'RenderMarkdownChecked',
           },
+          custom = {
+            todo = { raw = '[-]', rendered = '󰥔 ', highlight = 'RenderMarkdownTodo' },
+            progress = { raw = '[>]', rendered = ' ', highlight = 'RenderMarkdownProgress' },
+            cancelled = { raw = '[~]', rendered = '󰰱 ', highlight = 'RenderMarkdownCancelled' },
+          },
         },
         quote = {
           enabled = true,
@@ -66,167 +71,22 @@ return {
     end,
   },
 
-  -- Obsidian-like functionality
+  -- Custom highlight groups for markdown elements
   {
-    'epwalsh/obsidian.nvim',
-    version = '*',
-    lazy = true,
-    ft = 'markdown',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-    },
-    config = function()
-      require('obsidian').setup {
-        workspaces = {
-          {
-            name = 'personal',
-            path = '/Users/thrilok/Documents/obsidian',
-          },
-          {
-            name = 'work',
-            path = '/Users/thrilok/Documents/obsidian-work',
-          },
-        },
-
-        -- Daily notes configuration
-        daily_notes = {
-          folder = 'daily',
-          date_format = '%Y-%m-%d',
-          alias_format = '%B %-d, %Y',
-          template = 'daily-note.md',
-        },
-
-        -- Note completion
-        completion = {
-          nvim_cmp = true,
-          min_chars = 2,
-        },
-
-        -- Note templates
-        templates = {
-          subdir = 'templates',
-          date_format = '%Y-%m-%d',
-          time_format = '%H:%M',
-          tags = '',
-        },
-
-        -- Note naming and ID generation
-        note_id_func = function(title)
-          local suffix = ''
-          if title ~= nil then
-            suffix = title:gsub(' ', '-'):gsub('[^A-Za-z0-9-]', ''):lower()
-          else
-            for _ = 1, 4 do
-              suffix = suffix .. string.char(math.random(65, 90))
-            end
-          end
-          return tostring(os.time()) .. '-' .. suffix
+    'nvim-treesitter/nvim-treesitter',
+    optional = true,
+    opts = function(_, opts)
+      -- Set up custom highlight groups for markdown
+      vim.api.nvim_create_autocmd('ColorScheme', {
+        group = vim.api.nvim_create_augroup('MarkdownHighlights', { clear = true }),
+        callback = function()
+          vim.api.nvim_set_hl(0, 'RenderMarkdownTodo', { bold = true, fg = '#f78c6c' })
+          vim.api.nvim_set_hl(0, 'RenderMarkdownProgress', { bold = true, fg = '#f78c6c' })
+          vim.api.nvim_set_hl(0, 'RenderMarkdownCancelled', { bold = true, fg = '#ff5370' })
         end,
-
-        -- Note frontmatter
-        note_frontmatter_func = function(note)
-          local out = {
-            id = note.id,
-            aliases = note.aliases,
-            tags = note.tags,
-            created = os.date '%Y-%m-%d %H:%M:%S',
-            modified = os.date '%Y-%m-%d %H:%M:%S',
-          }
-
-          if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
-            for k, v in pairs(note.metadata) do
-              out[k] = v
-            end
-          end
-
-          return out
-        end,
-
-        -- Wiki links
-        wiki_link_func = function(opts)
-          if opts.id == nil then
-            return string.format('[[%s]]', opts.label)
-          elseif opts.label ~= opts.id then
-            return string.format('[[%s|%s]]', opts.id, opts.label)
-          else
-            return string.format('[[%s]]', opts.id)
-          end
-        end,
-
-        -- Markdown links
-        markdown_link_func = function(opts)
-          return string.format('[%s](%s)', opts.label, opts.path)
-        end,
-
-        -- Follow URL behavior
-        follow_url_func = function(url)
-          vim.fn.jobstart { 'open', url }
-        end,
-
-        -- Use advanced URI encoding
-        use_advanced_uri = true,
-
-        -- Finder settings
-        finder = 'fzf-lua',
-        finder_mappings = {
-          new = '<C-x>',
-          insert_link = '<C-l>',
-        },
-
-        -- Sorting for tags/references
-        sort_by = 'modified',
-        sort_reversed = true,
-
-        -- Search settings
-        search_max_lines = 1000,
-
-        -- Open files in new tab
-        open_notes_in = 'current',
-
-        -- UI settings
-        ui = {
-          enable = true,
-          update_debounce = 200,
-          checkboxes = {
-            [' '] = { char = '󰄱', hl_group = 'ObsidianTodo' },
-            ['x'] = { char = '󰱒', hl_group = 'ObsidianDone' },
-            ['>'] = { char = '', hl_group = 'ObsidianRightArrow' },
-            ['~'] = { char = '󰰱', hl_group = 'ObsidianTilde' },
-          },
-          bullets = { char = '•', hl_group = 'ObsidianBullet' },
-          external_link_icon = { char = '', hl_group = 'ObsidianExtLinkIcon' },
-          reference_text = { hl_group = 'ObsidianRefText' },
-          highlight_text = { hl_group = 'ObsidianHighlightText' },
-          tags = { hl_group = 'ObsidianTag' },
-          hl_groups = {
-            ObsidianTodo = { bold = true, fg = '#f78c6c' },
-            ObsidianDone = { bold = true, fg = '#89ddff' },
-            ObsidianRightArrow = { bold = true, fg = '#f78c6c' },
-            ObsidianTilde = { bold = true, fg = '#ff5370' },
-            ObsidianBullet = { bold = true, fg = '#89ddff' },
-            ObsidianRefText = { underline = true, fg = '#c792ea' },
-            ObsidianExtLinkIcon = { fg = '#c792ea' },
-            ObsidianTag = { italic = true, fg = '#89ddff' },
-            ObsidianHighlightText = { bg = '#75662e' },
-          },
-        },
-
-        -- Attachments
-        attachments = {
-          img_folder = 'assets/imgs',
-          img_text_func = function(client, path)
-            local link_path
-            local vault_relative_path = client:vault_relative_path(path)
-            if vault_relative_path ~= nil then
-              link_path = vault_relative_path
-            else
-              link_path = tostring(path)
-            end
-            local display_name = vim.fs.basename(link_path)
-            return string.format('![%s](%s)', display_name, link_path)
-          end,
-        },
-      }
+      })
+      -- Trigger the highlight setup
+      vim.cmd('doautocmd ColorScheme')
     end,
   },
 
@@ -235,7 +95,9 @@ return {
     'iamcco/markdown-preview.nvim',
     cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
     ft = { 'markdown' },
-    build = 'cd app && npm install',
+    build = function(plugin)
+      vim.fn.system('cd ' .. plugin.dir .. '/app && npm install')
+    end,
     config = function()
       vim.g.mkdp_auto_start = 0
       vim.g.mkdp_auto_close = 1

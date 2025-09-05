@@ -21,7 +21,7 @@ return {
             vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
             vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
             vim.keymap.set('n', 'K', vim.lsp.buf.hover, bufopts)
-            vim.keymap.set('i', '<C-s>', vim.lsp.buf.signature_help, bufopts)
+            vim.keymap.set('i', '<C-Space>', vim.lsp.buf.signature_help, bufopts)
           end
 
           -- Enable autoformat on save using conform

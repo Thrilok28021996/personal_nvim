@@ -58,17 +58,9 @@ return {
           module = 'orgmode.org.autocompletion.blink',
           fallbacks = { 'buffer' },
         },
-        obsidian = {
-          name = 'obsidian',
-          module = 'obsidian.completion',
-          -- Only enable in markdown files
-          enabled = function()
-            return vim.bo.filetype == 'markdown'
-          end,
-        },
       },
       per_filetype = {
-        markdown = { 'obsidian', 'lsp', 'path', 'snippets', 'buffer', 'markdown' },
+        markdown = { 'lsp', 'path', 'snippets', 'buffer' },
       },
     },
   },

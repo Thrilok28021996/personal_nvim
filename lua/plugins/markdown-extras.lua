@@ -106,8 +106,8 @@ return {
           MkdnEnter = {{'n', 'v'}, '<CR>'},
           MkdnTab = false,
           MkdnSTab = false,
-          MkdnNextLink = {'n', '<Tab>'},
-          MkdnPrevLink = {'n', '<S-Tab>'},
+          MkdnNextLink = {'n', '<leader>mn'},
+          MkdnPrevLink = {'n', '<leader>mp'},
           MkdnNextHeading = {'n', ']]'},
           MkdnPrevHeading = {'n', '[['},
           MkdnGoBack = {'n', '<BS>'},
@@ -121,8 +121,8 @@ return {
           MkdnYankAnchorLink = {'n', 'yaa'},
           MkdnYankFileAnchorLink = {'n', 'yfa'},
           MkdnIncreaseHeading = {'n', '+'},
-          MkdnDecreaseHeading = {'n', '-'},
-          MkdnToggleToDo = {{'n', 'v'}, '<C-Space>'},
+          MkdnDecreaseHeading = {'n', '<leader>m-'},
+          MkdnToggleToDo = {{'n', 'v'}, '<leader>mt'},
           MkdnNewListItem = false,
           MkdnNewListItemBelowInsert = {'n', 'o'},
           MkdnNewListItemAboveInsert = {'n', 'O'},
@@ -210,15 +210,6 @@ return {
     end,
   },
 
-  -- Markdown checklist management
-  {
-    'nfrid/markdown-togglecheck',
-    dependencies = { 'nfrid/treesitter-utils' },
-    ft = { 'markdown' },
-    config = function()
-      require('markdown-togglecheck').setup({
-        create_user_command = true,
-      })
-    end,
-  },
+  -- NOTE: Checkbox functionality provided by mkdnflow.nvim
+  -- Use <leader>mt to toggle checkboxes
 }

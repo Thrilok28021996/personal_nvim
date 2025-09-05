@@ -3,7 +3,6 @@ local o = vim.opt
 o.number = true
 o.relativenumber = true
 o.mouse = 'a'
-o.showmode = false
 o.clipboard = 'unnamedplus'
 o.breakindent = true
 o.undofile = true
@@ -101,3 +100,7 @@ o.path = o.path + '**' -- Recursive file search for :find
 o.wildmenu = true -- Enhanced command line completion
 o.wildignore = '*.pyc,*/__pycache__/*,*/node_modules/*,*/.git/*'
 o.grepprg = 'rg --vimgrep --smart-case --follow' -- Use ripgrep if available
+
+-- Built-in statusline configuration (replaces lualine)
+o.statusline = '%f %h%w%m%r %= %(%l,%c%V %= %P%)'
+o.showmode = true -- Show current mode in statusline
