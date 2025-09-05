@@ -15,53 +15,8 @@ end
 ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
--- Helper function for safe plugin loading
-local function safe_require(module)
-  local ok, result = pcall(require, module)
-  if not ok then
-    vim.notify("Failed to load plugin module: " .. module .. "\nError: " .. result, vim.log.levels.WARN)
-    return {}
-  end
-  return result
-end
-
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup {
-<<<<<<< HEAD
-  safe_require 'plugins.fileexplorer',
-  safe_require 'plugins.colorscheme',
-  safe_require 'plugins.which-key',
-  safe_require 'plugins.autoformat',
-  safe_require 'plugins.terminal',
-  safe_require 'plugins.autocompletion',
-  safe_require 'plugins.language',
-  safe_require 'plugins.linting',
-  safe_require 'plugins.debugging',
-  safe_require 'plugins.testing',
-  safe_require 'plugins.code-intelligence',
-  safe_require 'plugins.text-manipulation',
-  safe_require 'plugins.session-management',
-
-  safe_require 'plugins.mason',
-
-  safe_require 'plugins.indent-blankline',
-  safe_require 'plugins.bufferline',
-  safe_require 'plugins.autopairs',
-  safe_require 'plugins.lualine',
-  safe_require 'plugins.file-picker',
-  safe_require 'plugins.todo-comments',
-  safe_require 'plugins.noice',
-  safe_require 'plugins.git-signs',
-  safe_require 'plugins.lazygit',
-  safe_require 'plugins.git-tools',
-
-  -- INFO: Note Making Plugins.
-  safe_require 'notemd.tree-sitter',
-  safe_require 'notemd.obsidian',
-  safe_require 'notemd.markdown-preview',
-  safe_require 'notemd.img-clip',
-  safe_require 'notemd.rendering-markdown',
-=======
   require 'plugins.fileexplorer',
   require 'plugins.colorscheme',
   require 'plugins.which-key',
@@ -69,6 +24,13 @@ require('lazy').setup {
   require 'plugins.terminal',
   require 'plugins.autocompletion',
   require 'plugins.language',
+  require 'plugins.debugging',
+  require 'plugins.testing',
+  require 'plugins.code-intelligence',
+  require 'plugins.text-manipulation',
+  require 'plugins.session-management',
+  require 'plugins.git-tools',
+
   require 'plugins.mason',
 
   require 'plugins.indent-blankline',
@@ -80,11 +42,35 @@ require('lazy').setup {
   require 'plugins.noice',
   require 'plugins.git-signs',
   require 'plugins.lazygit',
+  
+  -- Org mode plugins
   require 'plugins.org-mode',
   require 'plugins.org-roam',
   require 'plugins.org-bullets',
+  
+  -- Visual and markdown plugins  
   require 'plugins.smear',
   require 'plugins.markdown',
   require 'plugins.markdown-extras',
->>>>>>> refs/remotes/origin/main
+
+  -- Note-taking plugins
+  require 'notemd.tree-sitter',
+  require 'notemd.obsidian',
+  require 'notemd.markdown-preview',
+  require 'notemd.img-clip',
+  require 'notemd.rendering-markdown',
 }
+
+-- Setup org treesitter parser commands
+vim.api.nvim_create_user_command('SetupOrgParser', function()
+  local setup_org = require('setup-org')
+  setup_org.install_org_parser()
+end, { desc = 'Configure org treesitter parser for installation' })
+
+vim.api.nvim_create_user_command('CheckOrgParser', function()
+  local setup_org = require('setup-org')
+  setup_org.check_org_parser()
+end, { desc = 'Check if org treesitter parser is installed' })
+
+-- Auto-configure org parser (doesn't install, just sets up configuration)
+pcall(require('setup-org').auto_setup)
