@@ -141,7 +141,7 @@ map('n', '<C-a>', 'ggVG', { desc = 'Select all content' })
 map('n', '<leader>lz', '<CMD>Lazy<CR>', { desc = 'Open Lazy (plugin manager)' })
 
 -- Git operations
-map('n', '<leader>lg', '<CMD>LazyGit<CR>', { desc = 'Open LazyGit' })
+map('n', '<leader>gg', '<CMD>LazyGit<CR>', { desc = 'Open LazyGit' })
 
 -- Built-in file operations (replaces FzfLua)
 map('n', '<leader>ff', '<CMD>find **/*<Left><Left><Left><Left>', { desc = 'Find Files (:find **)' })
@@ -150,11 +150,10 @@ map('n', '<leader>fb', '<CMD>ls<CR>:b<Space>', { desc = 'Find buffers (:ls then 
 
 -- Terminal keymaps (using built-in terminal)
 map('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
--- map('n', '<leader>et', '<CMD>split | terminal<CR>', { desc = 'Open terminal in split' })
--- map('n', '<leader>eT', '<CMD>vsplit | terminal<CR>', { desc = 'Open terminal in vertical split' })
-map('n', '<leader>et', '<CMD>tabnew | terminal<CR>', { desc = 'Open terminal in new tab' })
--- map('t', '<C-l>', '<CMD>clear<CR>', { desc = 'Clear terminal' })
+map('n', '<leader>et', '<CMD>split | terminal<CR>', { desc = 'Open terminal in split' })
+map('n', '<leader>eT', '<CMD>vsplit | terminal<CR>', { desc = 'Open terminal in vertical split' })
 
 -- File explorer (using oil.nvim)
 map('n', '-', '<CMD>Oil<CR>', { desc = 'Open file explorer' })
 -- map('n', '<leader>fE', '<CMD>vsplit | Oil<CR>', { desc = 'Open file explorer in vertical split' })
+
