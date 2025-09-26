@@ -59,9 +59,6 @@ return {
           fallbacks = { 'buffer' },
         },
       },
-      per_filetype = {
-        markdown = { 'lsp', 'path', 'snippets', 'buffer' },
-      },
     },
   },
   opts_extend = { 'sources.default' },

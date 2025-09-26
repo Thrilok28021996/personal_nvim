@@ -1,4 +1,8 @@
--- NOTE: fzf-lua removed - using built-in find/grep/buffer commands
--- All file picking functionality replaced with native Neovim commands in keymaps.lua
--- Benefits: Faster startup, no external dependencies, learn native Vim commands
-return {}
+return {
+  'ibhagwan/fzf-lua',
+  -- optional for icon support
+  dependencies = { 'nvim-tree/nvim-web-devicons' },
+  -- or if using mini.icons/mini.nvim
+  -- dependencies = { "echasnovski/mini.icons" },
+  opts = {},
+}

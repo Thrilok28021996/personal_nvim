@@ -1,7 +1,10 @@
--- NOTE: smear-cursor.nvim removed - using built-in cursor
--- Native alternatives:
--- - set cursorline - Highlight cursor line
--- - set cursorcolumn - Highlight cursor column 
--- - Built-in cursor movement is instant and efficient
--- Benefits: No plugin overhead, faster rendering, native cursor behavior
-return {}
+return {
+  'sphamba/smear-cursor.nvim',
+  opts = { -- Default  Range
+    stiffness = 0.8, -- 0.6      [0, 1]
+    trailing_stiffness = 0.5, -- 0.4      [0, 1]
+    stiffness_insert_mode = 0.6, -- 0.4      [0, 1]
+    trailing_stiffness_insert_mode = 0.6, -- 0.4      [0, 1]
+    distance_stop_animating = 0.5, -- 0.1      > 0
+  },
+}

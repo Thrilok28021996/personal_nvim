@@ -1,3 +1,7 @@
--- NOTE: nvim-autopairs removed - using built-in autopairs in keymaps.lua
--- Built-in autopairs provide basic functionality without plugin overhead
-return {}
+return {
+  -- Autoclose parentheses, brackets, quotes, etc.
+  'windwp/nvim-autopairs',
+  event = 'InsertEnter',
+  config = true,
+  opts = {},
+}

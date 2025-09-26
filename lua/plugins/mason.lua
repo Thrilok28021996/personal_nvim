@@ -21,34 +21,14 @@ return {
 
     mason_tool_installer.setup {
       ensure_installed = {
-        -- Formatters
         'prettier', -- prettier formatter
         'stylua', -- lua formatter
         'isort', -- python formatter
         'black', -- python formatter
-        'shfmt', -- shell script formatter
-
-        -- Linters
-        'ruff', -- python linter (also has ruff_format for formatting)
-
-        -- Language Servers
+        'pylint', -- python linter
+        -- "eslint_d", -- js linter
+        'ruff', --python formatter & linter
         'pyright', -- Python Language server
-        'lua-language-server', -- Lua LSP
-        'typescript-language-server', -- TypeScript/JavaScript LSP
-        'json-lsp', -- JSON LSP
-        'yaml-language-server', -- YAML LSP
-        'html-lsp', -- HTML LSP
-        'css-lsp', -- CSS LSP
-        'bash-language-server', -- Bash LSP
-        'dockerfile-language-server', -- Dockerfile LSP
-
-        -- Debug Adapters
-        'debugpy', -- Python debugger
-        -- 'node-debug2-adapter', -- Node.js debugger
-        'bash-debug-adapter', -- Bash debugger
-
-        -- Test Runners
-        -- pytest is installed via pip, not Mason
       },
     }
   end,
