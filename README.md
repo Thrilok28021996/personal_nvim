@@ -73,9 +73,9 @@ mv ~/.cache/nvim{,.bak}
 
 ### Note Making Plugins
 
-1. Markdown Rendering --> Render Markdown
+1. Note taking Plugin --> Obsidian
 2. Markdown Preview --> Peek
-3. Table Mode --> Vim Table Mode
+3. Rendering Markdown --> Rendering Markdown
 4. Add Images --> Image clip
 5. Hight Lighting --> Tree Sitter
 

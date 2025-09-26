@@ -1,6 +1,3 @@
--- Enable built-in Lua module loader cache for faster startup
-vim.loader.enable()
-
 require 'core.options'
 require 'core.keymaps'
 
@@ -11,8 +8,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   if vim.v.shell_error ~= 0 then
     error('Error cloning lazy.nvim:\n' .. out)
   end
-end
----@diagnostic disable-next-line: undefined-field
+end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 -- NOTE: Here is where you install your plugins.
@@ -24,24 +20,27 @@ require('lazy').setup {
   require 'plugins.terminal',
   require 'plugins.autocompletion',
   require 'plugins.language',
-  require 'plugins.debugging',
-  require 'plugins.testing',
-  require 'plugins.code-intelligence',
-  require 'plugins.text-manipulation',
-  require 'plugins.session-management',
-  require 'plugins.git-tools',
-
+  require 'plugins.linting',
   require 'plugins.mason',
-
+  -- require 'plugins.misc',
+  -- require 'plugins.ui',
+  require 'plugins.indent-blankline',
+  require 'plugins.bufferline',
+  require 'plugins.autopairs',
+  require 'plugins.lualine',
+  require 'plugins.file-picker',
+  require 'plugins.todo-comments',
+  require 'plugins.noice',
   require 'plugins.git-signs',
   require 'plugins.lazygit',
-  require 'plugins.markdown',
-  require 'plugins.markdown-extras',
 
-  -- Note-taking plugins
-  require 'notemd.tree-sitter',
+  -- INFO: Note Making Plugins.
+  require 'notemd.obsidian',
   require 'notemd.markdown-preview',
   require 'notemd.img-clip',
   require 'notemd.rendering-markdown',
-}
 
+  -- INFO: Jupyter
+  require 'jupyter.jupynium',
+  require 'jupyter.jupytext',
+}

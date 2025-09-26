@@ -1,106 +1,113 @@
--- core/options.lua
-local o = vim.opt
-o.number = true
-o.relativenumber = true
-o.mouse = 'a'
-o.clipboard = 'unnamedplus'
-o.breakindent = true
-o.undofile = true
+-- Make line numbers default
+vim.opt.number = true
+-- You can also add relative line numbers, to help with jumping.
+--  Experiment for yourself to see if you like it!
+-- vim.opt.relativenumber = true
 
--- Configure backup, swap, and undo directories
-o.backup = false
-o.writebackup = false
-o.swapfile = false
-o.undodir = vim.fn.expand('~/.config/nvim/undo')
+-- Enable mouse mode, can be useful for resizing splits for example!
+vim.opt.mouse = 'a'
+--vim.opt.rocks.hererocks = false
+--vim.opt.rocks.enabled = false
+-- Don't show the mode, since it's already in the status line
+vim.opt.showmode = false
 
--- Create undo directory if it doesn't exist
-local undo_dir = vim.fn.expand('~/.config/nvim/undo')
-if vim.fn.isdirectory(undo_dir) == 0 then
-  vim.fn.mkdir(undo_dir, 'p')
-end
-o.ignorecase = true
-o.smartcase = true
-o.signcolumn = 'yes'
-o.updatetime = 100 -- Faster diagnostics and CursorHold events
-o.timeoutlen = 500 -- Longer timeout to reduce keymap conflicts
-o.splitright = true
-o.splitbelow = true
-o.list = true
-o.listchars = { 
-  tab = '» ', 
-  trail = '·', 
-  nbsp = '␣',
-  leadmultispace = '▏   ', -- Show indent guides for 4+ spaces
-  extends = '◣',
-  precedes = '◤'
-}
-o.inccommand = 'split'
-o.cursorline = true
-o.scrolloff = 10
+-- Sync clipboard between OS and Neovim.
+--  Schedule the setting after `UiEnter` because it can increase startup-time.
+--  Remove this option if you want your OS clipboard to remain independent.
+--  See `:help 'clipboard'`
+vim.schedule(function()
+  vim.opt.clipboard = 'unnamedplus'
+end)
 
--- For markdown/writing
-o.wrap = true -- Wrap long lines
-o.linebreak = true -- Break lines at word boundaries
-o.conceallevel = 0 -- Don't hide markup by default (plugins will override per filetype)
-o.spell = false -- Disable global spell checking (enable per filetype in markdown files)
-o.spelllang = 'en_us' -- Spell check language
+-- Enable break indent
+vim.opt.breakindent = true
 
--- For better completion experience
-o.completeopt = 'menu,menuone,noselect' -- Better completion behavior
-o.pumheight = 10 -- Limit completion menu height
+-- Save undo history
+vim.opt.undofile = true
 
--- For better search experience
-o.hlsearch = true -- Highlight search matches
-o.incsearch = true -- Incremental search
+-- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
 
--- Performance optimizations
--- o.lazyredraw = true -- Disabled due to conflicts with Noice plugin
-o.synmaxcol = 240 -- Limit syntax highlighting for long lines
-o.redrawtime = 1500 -- Time limit for redrawing
-o.maxmempattern = 1000 -- Limit memory used for pattern matching
+-- Keep signcolumn on by default
+vim.opt.signcolumn = 'yes'
 
--- Better completion and messages
-o.shortmess:append('c') -- Don't give completion messages
-o.shortmess:append('I') -- Don't show intro message
-o.shortmess:append('W') -- Don't show "written" message
+-- Decrease update time
+vim.opt.updatetime = 250
 
--- Better folding
-o.foldmethod = 'expr'
-o.foldexpr = 'nvim_treesitter#foldexpr()'
-o.foldlevel = 99 -- Start with all folds open
-o.foldcolumn = '0'
-o.foldenable = false -- Disable folding by default
+-- Decrease mapped sequence wait time
+vim.opt.timeoutlen = 300
 
--- Better diff experience
-o.diffopt:append('internal,algorithm:patience,indent-heuristic')
+-- Configure how new splits should be opened
+vim.opt.splitright = true
+vim.opt.splitbelow = true
 
--- Better terminal colors
-o.termguicolors = true
+-- Sets how neovim will display certain whitespace characters in the editor.
+--  See `:help 'list'`
+--  and `:help 'listchars'`
+vim.opt.list = true
+vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
--- Better command line completion
-o.wildmode = 'longest:full,full'
-o.wildoptions = 'pum'
+-- Preview substitutions live, as you type!
+vim.opt.inccommand = 'split'
+-- You can also add relative line numbers, to help with jumping.
+--  Experiment for yourself to see if you like it!
+vim.opt.relativenumber = true
 
--- Better whitespace handling
-o.fillchars = {
-  eob = ' ', -- Remove ~ from end of buffer
-  fold = ' ',
-  vert = '│',
-  diff = '╱',
-}
+-- Enable mouse mode, can be useful for resizing splits for example!
+vim.opt.mouse = 'a'
 
--- Better session handling
-o.sessionoptions = 'buffers,curdir,folds,help,tabpages,winsize,winpos,terminal'
+-- Don't show the mode, since it's already in the status line
+vim.opt.showmode = false
 
--- Additional performance optimizations
-o.laststatus = 3 -- Global statusline for better performance
+-- Sync clipboard between OS and Neovim.
+--  Schedule the setting after `UiEnter` because it can increase startup-time.
+--  Remove this option if you want your OS clipboard to remain independent.
+--  See `:help 'clipboard'`
+vim.schedule(function()
+  vim.opt.clipboard = 'unnamedplus'
+end)
 
--- Enhanced built-in functionality
-o.path = o.path + '**' -- Recursive file search for :find
-o.wildmenu = true -- Enhanced command line completion
-o.wildignore = '*.pyc,*/__pycache__/*,*/node_modules/*,*/.git/*'
-o.grepprg = 'rg --vimgrep --smart-case --follow' -- Use ripgrep if available
+-- Enable break indent
+vim.opt.breakindent = true
 
--- Built-in statusline configuration (replaces lualine)
-o.statusline = '%f %h%w%m%r %= %(%l,%c%V %= %P%)'
-o.showmode = true -- Show current mode in statusline
+-- Save undo history
+vim.opt.undofile = true
+
+-- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+
+-- Keep signcolumn on by default
+vim.opt.signcolumn = 'yes'
+
+-- Decrease update time
+vim.opt.updatetime = 250
+
+-- Decrease mapped sequence wait time
+vim.opt.timeoutlen = 300
+
+-- Configure how new splits should be opened
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+
+-- Sets how neovim will display certain whitespace characters in the editor.
+--  See `:help 'list'`
+--  and `:help 'listchars'`
+vim.opt.list = true
+vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+
+-- Preview substitutions live, as you type!
+vim.opt.inccommand = 'split'
+
+-- Show which line your cursor is on
+vim.opt.cursorline = true
+
+-- Minimal number of screen lines to keep above and below the cursor.
+vim.opt.scrolloff = 10
+
+-- Show which line your cursor is on
+vim.opt.cursorline = true
+
+-- Minimal number of screen lines to keep above and below the cursor.
+vim.opt.scrolloff = 10

@@ -5,5 +5,8 @@ return {
     -- add options here
     -- or leave it empty to use the default settings
   },
-  -- Note: Keymaps are defined in core/keymaps.lua
+  keys = {
+    -- suggested keymap
+    { '<leader>p', '<cmd>PasteImage<cr>', desc = 'Paste image from system clipboard' },
+  },
 }
