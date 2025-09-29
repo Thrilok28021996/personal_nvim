@@ -73,6 +73,16 @@ map('n', '<leader>l', '<CMD>Lazy<CR>', { desc = 'Open Lazy' })
 map('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
 
 -- Fuzzy Finding
-map('n', '<leader>ff', '<CMD>FzfLua files<CR>', { desc = 'Find Files' })
-map('n', '<leader>fw', '<CMD>FzfLua live_grep<CR>', { desc = 'Find the word' })
-map('n', '<leader>fb', '<CMD>FzfLua buffers<CR>', { desc = 'Find the buffers' })
+map('n', '<leader>ff', function() require('mini.pick').builtin.files() end, { desc = 'Find Files' })
+map('n', '<leader>fw', function() require('mini.pick').builtin.grep_live() end, { desc = 'Find the word' })
+map('n', '<leader>fb', function() require('mini.pick').builtin.buffers() end, { desc = 'Find the buffers' })
+
+-- Terminal
+map('n', '<C-t>', '<CMD>terminal<CR>', { desc = 'Open terminal' })
+map('n', '<leader>th', '<CMD>split | terminal<CR>', { desc = 'Open terminal horizontally' })
+map('n', '<leader>tv', '<CMD>vsplit | terminal<CR>', { desc = 'Open terminal vertically' })
+map('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+map('t', '<C-h>', '<C-\\><C-n><C-w>h', { desc = 'Move to left window from terminal' })
+map('t', '<C-j>', '<C-\\><C-n><C-w>j', { desc = 'Move to down window from terminal' })
+map('t', '<C-k>', '<C-\\><C-n><C-w>k', { desc = 'Move to up window from terminal' })
+map('t', '<C-l>', '<C-\\><C-n><C-w>l', { desc = 'Move to right window from terminal' })

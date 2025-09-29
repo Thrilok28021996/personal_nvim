@@ -10,13 +10,11 @@ return {
     require('mini.indentscope').setup { symbol = '│' }
 
     -- Fuzzy finding
-    require('mini.pick').setup()
-    -- vim.keymap.set('n', '<leader>ff', function()
-    --   MiniPick.builtin.files()
-    -- end, { desc = 'Find Files' })
-    -- vim.keymap.set('n', '<leader>fg', function()
-    --   MiniPick.builtin.grep_live()
-    -- end, { desc = 'Find the word' })
+    require('mini.pick').setup({
+      source = {
+        cwd = vim.fn.getcwd()
+      }
+    })
 
     -- Status line
     require('mini.statusline').setup()

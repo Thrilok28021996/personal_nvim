@@ -17,30 +17,18 @@ require('lazy').setup {
   require 'plugins.colorscheme',
   require 'plugins.which-key',
   require 'plugins.autoformat',
-  require 'plugins.terminal',
   require 'plugins.autocompletion',
   require 'plugins.language',
-  require 'plugins.linting',
   require 'plugins.mason',
-  -- require 'plugins.misc',
-  -- require 'plugins.ui',
-  require 'plugins.indent-blankline',
-  require 'plugins.bufferline',
-  require 'plugins.autopairs',
-  require 'plugins.lualine',
-  require 'plugins.file-picker',
-  require 'plugins.todo-comments',
-  require 'plugins.noice',
+  require 'plugins.misc',
+
   require 'plugins.git-signs',
   require 'plugins.lazygit',
 
   -- INFO: Note Making Plugins.
-  require 'notemd.obsidian',
+
+  require 'notemd.tree-sitter',
   require 'notemd.markdown-preview',
   require 'notemd.img-clip',
   require 'notemd.rendering-markdown',
-
-  -- INFO: Jupyter
-  require 'jupyter.jupynium',
-  require 'jupyter.jupytext',
 }

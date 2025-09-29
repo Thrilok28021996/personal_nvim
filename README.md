@@ -67,9 +67,8 @@ mv ~/.cache/nvim{,.bak}
 9. Mason(Programming Language Installer) --> Mason
 10. Misc --> Mini.nvim,Indentscope,pick,statusline,pairs,icons,tabline
 11. Comments (ToDo) --> Todo-comments
-12. Command Line --> Noice
-13. Git Signs --> Git Signs
-14. Git Integration --> Lazy Git
+12. Git Signs --> Git Signs
+13. Git Integration --> Lazy Git
 
 ### Note Making Plugins
 
@@ -78,50 +77,3 @@ mv ~/.cache/nvim{,.bak}
 3. Rendering Markdown --> Rendering Markdown
 4. Add Images --> Image clip
 5. Hight Lighting --> Tree Sitter
-
-### Markdown
-
-Install deno first in debian and add the plugin next to use peek as markdown-preview
-
-### Jupyter Notebook
-
-To run the jupyter-notebook
-
-### Requirements
-
-- 💻 Linux, macOS and Windows (CMD, PowerShell, WSL2)
-- Neovim >= v0.8
-- 🦊 Firefox
-
-  - Other browsers are not supported due to their limitation with Selenium (see #49)
-
-- 🦎 Mozilla geckodriver
-
-  - May already be installed with Firefox. Check geckodriver -V
-
-- 🐍 Python >= 3.8
-
-  - Supported Python installation methods include system-level and Conda
-
-- 📔 Jupyter Notebook >= 6.2
-
-  - Jupyter Lab is not supported
-
-  ```console
-
-  # jupyter-console is optional and used for `:JupyniumKernelOpenInTerminal`
-
-  pip install notebook nbclassic jupyter-console
-  ```
-
-Important note about Notebook 7 (breaking change!)
-
-Jupynium does not support Notebook 7 yet. In the meantime, you can change the
-
-default_notebook_URL = "localhost:8888/nbclassic"
-
-in require("jupynium").setup({ ... }) to use the classic (Notebook 6) interface with Jupynium. This is the new default setting from now on.
-
-Don't forget to upgrade your notebook and install nbclassic (pip install --upgrade notebook nbclassic) when you set this.
-
-For more details. GO to this link: https://github.com/kiyoon/jupynium.nvim?utm_source=chatgpt.com
