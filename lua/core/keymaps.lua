@@ -37,7 +37,12 @@ map('n', 'x', '"_x', { noremap = true, silent = true, desc = 'Delete single char
 -- Navigate buffers
 map('n', '<Tab>', '<CMD>bnext<CR>', { noremap = true, silent = true, desc = 'Go to next Tab' })
 map('n', '<S-Tab>', '<CMD>bprevious<CR>', { noremap = true, silent = true, desc = 'Go to previous tab' })
+
+-- Close buffers
 map('n', '<leader>tx', '<CMD>bdel<CR>', { remap = true, silent = true, desc = 'Close the current buffer' })
+map('n', '<leader>tc', '<CMD>bdel<CR>', { noremap = true, silent = true, desc = 'Close the current buffer' })
+map('n', '<leader>tq', '<CMD>bdel!<CR>', { noremap = true, silent = true, desc = 'Force close the current buffer' })
+map('n', '<C-w>', '<CMD>bdel<CR>', { noremap = true, silent = true, desc = 'Close the current buffer' })
 
 -- window management
 map('n', '<leader>v', '<C-w>v', { noremap = true, silent = true, desc = 'split window vertically' })
