@@ -156,6 +156,53 @@ return {
 
     dap.configurations.typescript = dap.configurations.javascript
 
+    -- C/C++ debugging using codelldb
+    dap.adapters.codelldb = {
+      type = 'server',
+      port = '${port}',
+      executable = {
+        command = vim.fn.stdpath("data") .. '/mason/packages/codelldb/extension/adapter/codelldb',
+        args = { '--port', '${port}' },
+      },
+    }
+
+    -- C/C++ configurations
+    dap.configurations.cpp = {
+      {
+        name = 'Launch file',
+        type = 'codelldb',
+        request = 'launch',
+        program = function()
+          return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+        end,
+        cwd = '${workspaceFolder}',
+        stopOnEntry = false,
+        args = function()
+          local args_string = vim.fn.input('Arguments: ')
+          return vim.split(args_string, ' +')
+        end,
+        runInTerminal = false,
+      },
+      {
+        name = 'Attach to process',
+        type = 'codelldb',
+        request = 'attach',
+        pid = function()
+          local handle = io.popen('ps aux | grep -v grep')
+          if handle then
+            local result = handle:read('*a')
+            handle:close()
+            return vim.fn.input('PID: ')
+          end
+          return ''
+        end,
+        args = {},
+      },
+    }
+
+    -- Share C++ config with C
+    dap.configurations.c = dap.configurations.cpp
+
     -- Bash debugging
     dap.adapters.bashdb = {
       type = 'executable',

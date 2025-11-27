@@ -5,7 +5,6 @@ return { -- Autoformat
   config = function()
     require('conform').setup {
       formatters_by_ft = {
-
         -- Conform will run multiple formatters sequentially
         -- javascript = { "prettier" },
         -- typescript = { "prettier" },
@@ -19,8 +18,11 @@ return { -- Autoformat
         markdown = { 'prettier' },
         -- graphql = { "prettier" },
         lua = { 'stylua' },
-        -- python = { 'isort', 'black', 'ruff_format' },
         python = { 'isort', 'black', 'ruff' },
+
+        -- C/C++ formatting
+        c = { 'clang_format' },
+        cpp = { 'clang_format' },
       },
       format_on_save = {
         -- These options will be passed to conform.format()

@@ -3,7 +3,8 @@ return {
   dependencies = {
     'WhoIsSethDaniel/mason-tool-installer.nvim',
   },
-  event = 'VeryLazy',
+  event = 'VimEnter', -- Load on startup instead of VeryLazy
+  priority = 100, -- Load early
   config = function()
     local mason = require 'mason'
 
@@ -27,10 +28,20 @@ return {
         'isort', -- python formatter
         'black', -- python formatter
         'pylint', -- python linter
-        -- "eslint_d", -- js linter
-        'ruff', --python formatter & linter
+        'ruff', -- python formatter & linter
         'pyright', -- Python Language server
+
+        -- C/C++ tools
+        'clangd', -- C/C++ Language server
+        'clang-format', -- C/C++ formatter
+        'codelldb', -- C/C++ debugger
       },
+
+      -- Automatically install tools on startup
+      auto_update = false,
+      run_on_start = true,
+      start_delay = 3000, -- 3 second delay after start
+      debounce_hours = 5, -- at least 5 hours between attempts
     }
   end,
 }

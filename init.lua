@@ -20,6 +20,7 @@ require('lazy').setup {
   require 'plugins.autocompletion',
   require 'plugins.language',
   require 'plugins.mason',
+  require 'plugins.debugging',
   require 'plugins.misc',
 
   require 'plugins.git-signs',
