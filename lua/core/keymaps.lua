@@ -91,3 +91,25 @@ map('t', '<C-h>', '<C-\\><C-n><C-w>h', { desc = 'Move to left window from termin
 map('t', '<C-j>', '<C-\\><C-n><C-w>j', { desc = 'Move to down window from terminal' })
 map('t', '<C-k>', '<C-\\><C-n><C-w>k', { desc = 'Move to up window from terminal' })
 map('t', '<C-l>', '<C-\\><C-n><C-w>l', { desc = 'Move to right window from terminal' })
+
+-- Gen.nvim - Fast AI prompts (use for quick tasks)
+map({ 'n', 'v' }, '<leader>gg', ':Gen<CR>', { desc = 'Gen: Show all prompts' })
+map({ 'n', 'v' }, '<leader>gc', ':Gen Chat<CR>', { desc = 'Gen: Chat' })
+
+-- Gen.nvim - Code completion prompts
+map({ 'n', 'v' }, '<leader>gk', ':Gen Complete_Code<CR>', { desc = 'Gen: Complete code' })
+map({ 'n', 'v' }, '<leader>ge', ':Gen Explain_Code<CR>', { desc = 'Gen: Explain' })
+map({ 'n', 'v' }, '<leader>gf', ':Gen Fix_Code<CR>', { desc = 'Gen: Fix bugs' })
+map({ 'n', 'v' }, '<leader>go', ':Gen Optimize_Code<CR>', { desc = 'Gen: Optimize' })
+map({ 'n', 'v' }, '<leader>gr', ':Gen Refactor_Code<CR>', { desc = 'Gen: Refactor' })
+map({ 'n', 'v' }, '<leader>gt', ':Gen Generate_Tests<CR>', { desc = 'Gen: Generate tests' })
+map({ 'n', 'v' }, '<leader>gb', ':Gen Find_Bugs<CR>', { desc = 'Gen: Find bugs' })
+map({ 'n', 'v' }, '<leader>gd', ':Gen Generate_Docs<CR>', { desc = 'Gen: Generate docs' })
+map({ 'n', 'v' }, '<leader>gv', ':Gen Review_Code<CR>', { desc = 'Gen: Review code' })
+map({ 'n', 'v' }, '<leader>gx', ':Gen Add_Comments<CR>', { desc = 'Gen: Add comments' })
+
+-- Avante AI - Advanced assistant (use for complex tasks)
+-- <leader>aa - Toggle Avante chat
+-- <leader>ar - Refresh Avante
+-- <leader>ae - Edit with AI
+-- See :h avante-keymaps for full list

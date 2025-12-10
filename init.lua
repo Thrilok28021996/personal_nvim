@@ -25,6 +25,8 @@ require('lazy').setup {
 
   require 'plugins.git-signs',
   require 'plugins.lazygit',
+  require 'plugins.gen-nvim', -- Fast AI prompts
+  require 'plugins.avante', -- Advanced AI assistant
 
   -- INFO: Note Making Plugins.
 

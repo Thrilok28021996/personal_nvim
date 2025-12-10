@@ -64,3 +64,18 @@ vim.api.nvim_create_autocmd('FileType', {
     ]]
   end,
 })
+
+-- Enable true color support
+vim.opt.termguicolors = true
+
+-- Enable italics for various syntax elements
+vim.cmd [[
+  highlight Comment cterm=italic gui=italic
+  highlight Keyword cterm=italic gui=italic
+  highlight Type cterm=italic gui=italic
+  highlight Function cterm=italic gui=italic
+  highlight String cterm=italic gui=italic
+  highlight Conditional cterm=italic gui=italic
+  highlight Repeat cterm=italic gui=italic
+  highlight Identifier cterm=italic gui=italic
+]]
