@@ -69,13 +69,32 @@ vim.api.nvim_create_autocmd('FileType', {
 vim.opt.termguicolors = true
 
 -- Enable italics for various syntax elements
-vim.cmd [[
-  highlight Comment cterm=italic gui=italic
-  highlight Keyword cterm=italic gui=italic
-  highlight Type cterm=italic gui=italic
-  highlight Function cterm=italic gui=italic
-  highlight String cterm=italic gui=italic
-  highlight Conditional cterm=italic gui=italic
-  highlight Repeat cterm=italic gui=italic
-  highlight Identifier cterm=italic gui=italic
-]]
+local italics = {
+  'Comment',
+  'Keyword',
+  'Type',
+  'Function',
+  'String',
+  'Conditional',
+  'Repeat',
+  'Identifier',
+}
+for _, group in ipairs(italics) do
+  vim.cmd(string.format('highlight %s cterm=italic gui=italic', group))
+end
+
+-- ============================================================================
+-- Disable Unused Providers (reduces startup warnings)
+-- ============================================================================
+
+-- Disable Node.js provider (not needed for Python/C++ IDE)
+vim.g.loaded_node_provider = 0
+
+-- Disable Perl provider (not needed)
+vim.g.loaded_perl_provider = 0
+
+-- Disable Python provider (we use LSP for Python, not remote plugins)
+vim.g.loaded_python3_provider = 0
+
+-- Disable Ruby provider (not needed)
+vim.g.loaded_ruby_provider = 0

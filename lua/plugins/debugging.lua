@@ -7,77 +7,72 @@ return {
     'mfussenegger/nvim-dap-python',
   },
   config = function()
-    local dap = require('dap')
-    local dapui = require('dapui')
+    local dap = require 'dap'
+    local dapui = require 'dapui'
 
     -- Setup DAP UI
-    dapui.setup({
-      icons = { expanded = "▾", collapsed = "▸", current_frame = "▸" },
+    dapui.setup {
+      icons = { expanded = '▾', collapsed = '▸', current_frame = '▸' },
       mappings = {
-        -- Use a table to apply multiple mappings
-        expand = { "<CR>", "<2-LeftMouse>" },
-        open = "o",
-        remove = "d",
-        edit = "e",
-        repl = "r",
-        toggle = "t",
+        expand = { '<CR>', '<2-LeftMouse>' },
+        open = 'o',
+        remove = 'd',
+        edit = 'e',
+        repl = 'r',
+        toggle = 't',
       },
-      -- Expand lines larger than the window
-      expand_lines = vim.fn.has("nvim-0.7") == 1,
-      -- Layouts define sections of the screen to place windows.
+      expand_lines = vim.fn.has 'nvim-0.7' == 1,
       layouts = {
         {
           elements = {
-            { id = "scopes", size = 0.25 },
-            "breakpoints",
-            "stacks",
-            "watches",
+            { id = 'scopes', size = 0.25 },
+            'breakpoints',
+            'stacks',
+            'watches',
           },
           size = 40,
-          position = "left",
+          position = 'left',
         },
         {
           elements = {
-            "repl",
-            "console",
+            'repl',
+            'console',
           },
           size = 0.25,
-          position = "bottom",
+          position = 'bottom',
         },
       },
       controls = {
-        -- Requires Neovim nightly (or 0.8 when released)
         enabled = true,
-        -- Display controls in this element
-        element = "repl",
+        element = 'repl',
         icons = {
-          pause = "",
-          play = "",
-          step_into = "",
-          step_over = "",
-          step_out = "",
-          step_back = "",
-          run_last = "↻",
-          terminate = "□",
+          pause = '',
+          play = '',
+          step_into = '',
+          step_over = '',
+          step_out = '',
+          step_back = '',
+          run_last = '↻',
+          terminate = '□',
         },
       },
       floating = {
         max_height = nil,
         max_width = nil,
-        border = "single",
+        border = 'single',
         mappings = {
-          close = { "q", "<Esc>" },
+          close = { 'q', '<Esc>' },
         },
       },
       windows = { indent = 1 },
       render = {
         max_type_length = nil,
         max_value_lines = 100,
-      }
-    })
+      },
+    }
 
     -- Setup virtual text
-    require('nvim-dap-virtual-text').setup({
+    require('nvim-dap-virtual-text').setup {
       enabled = true,
       enabled_commands = true,
       highlight_changed_variables = true,
@@ -97,23 +92,23 @@ return {
       virt_text_pos = vim.fn.has 'nvim-0.10' == 1 and 'inline' or 'eol',
       all_frames = false,
       virt_lines = false,
-      virt_text_win_col = nil
-    })
+      virt_text_win_col = nil,
+    }
 
     -- Auto open/close DAP UI
-    dap.listeners.after.event_initialized["dapui_config"] = function()
+    dap.listeners.after.event_initialized['dapui_config'] = function()
       dapui.open()
     end
-    dap.listeners.before.event_terminated["dapui_config"] = function()
+    dap.listeners.before.event_terminated['dapui_config'] = function()
       dapui.close()
     end
-    dap.listeners.before.event_exited["dapui_config"] = function()
+    dap.listeners.before.event_exited['dapui_config'] = function()
       dapui.close()
     end
 
     -- Python debugging setup
-    require('dap-python').setup('python')
-    
+    require('dap-python').setup 'python'
+
     -- Python configurations
     table.insert(dap.configurations.python, {
       type = 'python',
@@ -121,8 +116,8 @@ return {
       name = 'Launch file with arguments',
       program = '${file}',
       args = function()
-        local args_string = vim.fn.input('Arguments: ')
-        return vim.split(args_string, " +")
+        local args_string = vim.fn.input 'Arguments: '
+        return vim.split(args_string, ' +')
       end,
       console = 'integratedTerminal',
       cwd = '${workspaceFolder}',
@@ -132,7 +127,7 @@ return {
     dap.adapters.node2 = {
       type = 'executable',
       command = 'node',
-      args = {os.getenv('HOME') .. '/.local/share/nvim/mason/packages/node-debug2-adapter/out/src/nodeDebug.js'},
+      args = { os.getenv 'HOME' .. '/.local/share/nvim/mason/packages/node-debug2-adapter/out/src/nodeDebug.js' },
     }
 
     dap.configurations.javascript = {
@@ -150,7 +145,7 @@ return {
         name = 'Attach to process',
         type = 'node2',
         request = 'attach',
-        processId = require'dap.utils'.pick_process,
+        processId = require('dap.utils').pick_process,
       },
     }
 
@@ -161,7 +156,7 @@ return {
       type = 'server',
       port = '${port}',
       executable = {
-        command = vim.fn.stdpath("data") .. '/mason/packages/codelldb/extension/adapter/codelldb',
+        command = vim.fn.stdpath 'data' .. '/mason/packages/codelldb/extension/adapter/codelldb',
         args = { '--port', '${port}' },
       },
     }
@@ -178,7 +173,7 @@ return {
         cwd = '${workspaceFolder}',
         stopOnEntry = false,
         args = function()
-          local args_string = vim.fn.input('Arguments: ')
+          local args_string = vim.fn.input 'Arguments: '
           return vim.split(args_string, ' +')
         end,
         runInTerminal = false,
@@ -188,11 +183,11 @@ return {
         type = 'codelldb',
         request = 'attach',
         pid = function()
-          local handle = io.popen('ps aux | grep -v grep')
+          local handle = io.popen 'ps aux | grep -v grep'
           if handle then
-            local result = handle:read('*a')
+            local result = handle:read '*a'
             handle:close()
-            return vim.fn.input('PID: ')
+            return vim.fn.input 'PID: '
           end
           return ''
         end,
@@ -206,7 +201,7 @@ return {
     -- Bash debugging
     dap.adapters.bashdb = {
       type = 'executable',
-      command = vim.fn.stdpath("data") .. '/mason/packages/bash-debug-adapter/bash-debug-adapter',
+      command = vim.fn.stdpath 'data' .. '/mason/packages/bash-debug-adapter/bash-debug-adapter',
       name = 'bashdb',
     }
 
@@ -216,8 +211,8 @@ return {
         request = 'launch',
         name = 'Launch file',
         showDebugOutput = true,
-        pathBashdb = vim.fn.stdpath("data") .. '/mason/packages/bash-debug-adapter/extension/bashdb_dir/bashdb',
-        pathBashdbLib = vim.fn.stdpath("data") .. '/mason/packages/bash-debug-adapter/extension/bashdb_dir',
+        pathBashdb = vim.fn.stdpath 'data' .. '/mason/packages/bash-debug-adapter/extension/bashdb_dir/bashdb',
+        pathBashdbLib = vim.fn.stdpath 'data' .. '/mason/packages/bash-debug-adapter/extension/bashdb_dir',
         trace = true,
         file = '${file}',
         program = '${file}',
@@ -229,14 +224,14 @@ return {
         args = {},
         env = {},
         terminalKind = 'integrated',
-      }
+      },
     }
 
     -- DAP signs
-    vim.fn.sign_define('DapBreakpoint', {text='🔴', texthl='', linehl='', numhl=''})
-    vim.fn.sign_define('DapBreakpointCondition', {text='🟡', texthl='', linehl='', numhl=''})
-    vim.fn.sign_define('DapLogPoint', {text='🔵', texthl='', linehl='', numhl=''})
-    vim.fn.sign_define('DapStopped', {text='▶️', texthl='', linehl='debugPC', numhl=''})
-    vim.fn.sign_define('DapBreakpointRejected', {text='❌', texthl='', linehl='', numhl=''})
+    vim.fn.sign_define('DapBreakpoint', { text = '🔴', texthl = '', linehl = '', numhl = '' })
+    vim.fn.sign_define('DapBreakpointCondition', { text = '🟡', texthl = '', linehl = '', numhl = '' })
+    vim.fn.sign_define('DapLogPoint', { text = '🔵', texthl = '', linehl = '', numhl = '' })
+    vim.fn.sign_define('DapStopped', { text = '▶️', texthl = '', linehl = 'debugPC', numhl = '' })
+    vim.fn.sign_define('DapBreakpointRejected', { text = '❌', texthl = '', linehl = '', numhl = '' })
   end,
 }

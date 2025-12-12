@@ -11,105 +11,318 @@ local map = vim.keymap.set
 -- Disable the spacebar key's default behavior in Normal and Visual modes
 map({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
--- clear highlights
-map('n', '<Esc>', ':noh<CR>', { noremap = true, silent = true, desc = 'Clear highlights' })
+-- ============================================================================
+-- Basic Editor Operations
+-- ============================================================================
 
--- save file
-map('n', '<C-s>', '<cmd> w <CR>', { noremap = true, silent = true, desc = 'Save the File' })
--- -- Comment
-map('n', '<C-/>', 'gcc', { desc = 'toggle comment', remap = true, desc = 'Comment the lines' })
-map('v', '<C-/>', 'gc', { desc = 'toggle comment', remap = true, desc = 'Comment the lines' })
--- save file without auto-formatting
--- [[ map('n', '<leader>sn', '<cmd>noautocmd w <CR>', {noremap=true,silent=true}) ]]
+-- Clear highlights
+map('n', '<Esc>', '<cmd>noh<CR>', { noremap = true, silent = true, desc = 'Clear search highlights' })
 
--- quit file
-map('n', '<C-q>', '<cmd> q <CR>', { noremap = true, silent = true, desc = 'Quit the IDE' })
+-- Save file
+map('n', '<C-s>', '<cmd>w<CR>', { noremap = true, silent = true, desc = 'Save file' })
 
--- delete single character without copying into register
-map('n', 'x', '"_x', { noremap = true, silent = true, desc = 'Delete single character' })
+-- Quit file
+map('n', '<C-q>', '<cmd>q<CR>', { noremap = true, silent = true, desc = 'Quit window' })
 
--- Resize with arrows
--- map('n', '<Up>', ':resize -2<CR>', { noremap = true, silent = true, desc = 'Save the File' })
--- map('n', '<Down>', ':resize +2<CR>', { noremap = true, silent = true, desc = 'Save the File' })
--- map('n', '<Left>', ':vertical resize -2<CR>', { noremap = true, silent = true, desc = 'Save the File' })
--- map('n', '<Right>', ':vertical resize +2<CR>', { noremap = true, silent = true, desc = 'Save the File' })
+-- Comment toggle
+map('n', '<C-/>', 'gcc', { remap = true, desc = 'Toggle comment' })
+map('v', '<C-/>', 'gc', { remap = true, desc = 'Toggle comment' })
+
+-- Delete single character without copying into register
+map('n', 'x', '"_x', { noremap = true, silent = true, desc = 'Delete character' })
+
+-- Select all content
+map('n', '<C-a>', 'ggVG', { noremap = true, silent = true, desc = 'Select all content' })
+
+-- Yank to system clipboard
+map({ 'n', 'v' }, '<leader>y', [["+y]], { noremap = true, silent = true, desc = 'Yank to system clipboard' })
+map('n', '<leader>Y', [["+Y]], { noremap = true, silent = true, desc = 'Yank line to system clipboard' })
+
+-- Search and replace with confirmation
+map('n', '<leader>sr', [[:%s///gc<Left><Left><Left>]], { noremap = true, silent = true, desc = 'Search and replace' })
+
+-- ============================================================================
+-- Buffer Management
+-- ============================================================================
 
 -- Navigate buffers
-map('n', '<Tab>', '<CMD>bnext<CR>', { noremap = true, silent = true, desc = 'Go to next Tab' })
-map('n', '<S-Tab>', '<CMD>bprevious<CR>', { noremap = true, silent = true, desc = 'Go to previous tab' })
+map('n', '<Tab>', '<cmd>bnext<CR>', { noremap = true, silent = true, desc = 'Next buffer' })
+map('n', '<S-Tab>', '<cmd>bprevious<CR>', { noremap = true, silent = true, desc = 'Previous buffer' })
 
 -- Close buffers
-map('n', '<leader>tx', '<CMD>bdel<CR>', { remap = true, silent = true, desc = 'Close the current buffer' })
-map('n', '<leader>tc', '<CMD>bdel<CR>', { noremap = true, silent = true, desc = 'Close the current buffer' })
-map('n', '<leader>tq', '<CMD>bdel!<CR>', { noremap = true, silent = true, desc = 'Force close the current buffer' })
-map('n', '<C-w>', '<CMD>bdel<CR>', { noremap = true, silent = true, desc = 'Close the current buffer' })
+map('n', '<leader>bc', '<cmd>bdel<CR>', { noremap = true, silent = true, desc = 'Close buffer' })
+map('n', '<leader>bq', '<cmd>bdel!<CR>', { noremap = true, silent = true, desc = 'Force close buffer' })
 
--- window management
-map('n', '<leader>v', '<C-w>v', { noremap = true, silent = true, desc = 'split window vertically' })
-map('n', '<leader>h', '<C-w>s', { noremap = true, silent = true, desc = 'split window horizontally' })
-map('n', '<leader>we', '<C-w>=', { noremap = true, silent = true, desc = 'make split windows equal width & height' })
-map('n', '<leader>wc', '<CMD>close<CR>', { noremap = true, silent = true, desc = 'close current split window' })
+-- ============================================================================
+-- Window Management
+-- ============================================================================
 
--- Navigate between splits
-map('n', '<C-k>', '<CMD>wincmd k<CR>', { noremap = true, silent = true, desc = 'Go to UP Window' })
-map('n', '<C-j>', '<CMD>wincmd j<CR>', { noremap = true, silent = true, desc = 'GO to Down Window' })
-map('n', '<C-h>', '<CMD>wincmd h<CR>', { noremap = true, silent = true, desc = 'Go to Left Window' })
-map('n', '<C-l>', '<CMD>wincmd l<CR>', { noremap = true, silent = true, desc = 'Go to Right Window' })
+-- Split windows
+map('n', '<leader>v', '<C-w>v', { noremap = true, silent = true, desc = 'Split window vertically' })
+map('n', '<leader>h', '<C-w>s', { noremap = true, silent = true, desc = 'Split window horizontally' })
+map('n', '<leader>we', '<C-w>=', { noremap = true, silent = true, desc = 'Equal window sizes' })
+map('n', '<leader>wc', '<cmd>close<CR>', { noremap = true, silent = true, desc = 'Close window' })
+
+-- Navigate between windows
+map('n', '<C-k>', '<cmd>wincmd k<CR>', { noremap = true, silent = true, desc = 'Move to window above' })
+map('n', '<C-j>', '<cmd>wincmd j<CR>', { noremap = true, silent = true, desc = 'Move to window below' })
+map('n', '<C-h>', '<cmd>wincmd h<CR>', { noremap = true, silent = true, desc = 'Move to window left' })
+map('n', '<C-l>', '<cmd>wincmd l<CR>', { noremap = true, silent = true, desc = 'Move to window right' })
+
+-- ============================================================================
+-- Visual Mode Operations
+-- ============================================================================
 
 -- Stay in indent mode
-map('v', '<', '<gv', { noremap = true, silent = true, desc = 'Left Indent' })
-map('v', '>', '>gv', { noremap = true, silent = true, desc = 'Right Indent' })
+map('v', '<', '<gv', { noremap = true, silent = true, desc = 'Indent left' })
+map('v', '>', '>gv', { noremap = true, silent = true, desc = 'Indent right' })
 
 -- Keep last yanked when pasting
-map('v', 'p', '"_dP', { noremap = true, silent = true, desc = 'Paste the yanked content' })
+map('v', 'p', '"_dP', { noremap = true, silent = true, desc = 'Paste without yanking' })
 
--- Search and replace
-map('n', '<leader>sr', [[:%s///gc<Left><Left><Left>]], { desc = 'Prompted search and replace with confirmation' })
+-- ============================================================================
+-- Plugin Manager
+-- ============================================================================
 
--- Explicitly yank to system clipboard (highlighted and entire row)
-map({ 'n', 'v' }, '<leader>y', [["+y]])
-map('n', '<leader>Y', [["+Y]])
+map('n', '<leader>l', '<cmd>Lazy<CR>', { noremap = true, silent = true, desc = 'Open Lazy plugin manager' })
 
--- Map Ctrl+a to select all in normal mode
-map('n', '<C-a>', 'ggVG', { noremap = true, silent = true, desc = 'Select the All the content of the file' })
--- Lazy
-map('n', '<leader>l', '<CMD>Lazy<CR>', { desc = 'Open Lazy' })
+-- ============================================================================
 -- File Explorer
-map('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+-- ============================================================================
 
+map('n', '-', '<cmd>Oil<CR>', { noremap = true, silent = true, desc = 'Open parent directory' })
+
+-- ============================================================================
 -- Fuzzy Finding
-map('n', '<leader>ff', function() require('mini.pick').builtin.files() end, { desc = 'Find Files' })
-map('n', '<leader>fw', function() require('mini.pick').builtin.grep_live() end, { desc = 'Find the word' })
-map('n', '<leader>fb', function() require('mini.pick').builtin.buffers() end, { desc = 'Find the buffers' })
+-- ============================================================================
 
+map('n', '<leader>ff', function()
+  require('mini.pick').builtin.files()
+end, { noremap = true, silent = true, desc = 'Find files' })
+
+map('n', '<leader>fw', function()
+  require('mini.pick').builtin.grep_live()
+end, { noremap = true, silent = true, desc = 'Find word (grep)' })
+
+map('n', '<leader>fb', function()
+  require('mini.pick').builtin.buffers()
+end, { noremap = true, silent = true, desc = 'Find buffers' })
+
+-- ============================================================================
 -- Terminal
-map('n', '<C-t>', '<CMD>terminal<CR>', { desc = 'Open terminal' })
-map('n', '<leader>th', '<CMD>split | terminal<CR>', { desc = 'Open terminal horizontally' })
-map('n', '<leader>tv', '<CMD>vsplit | terminal<CR>', { desc = 'Open terminal vertically' })
-map('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
-map('t', '<C-h>', '<C-\\><C-n><C-w>h', { desc = 'Move to left window from terminal' })
-map('t', '<C-j>', '<C-\\><C-n><C-w>j', { desc = 'Move to down window from terminal' })
-map('t', '<C-k>', '<C-\\><C-n><C-w>k', { desc = 'Move to up window from terminal' })
-map('t', '<C-l>', '<C-\\><C-n><C-w>l', { desc = 'Move to right window from terminal' })
+-- ============================================================================
 
--- Gen.nvim - Fast AI prompts (use for quick tasks)
-map({ 'n', 'v' }, '<leader>gg', ':Gen<CR>', { desc = 'Gen: Show all prompts' })
-map({ 'n', 'v' }, '<leader>gc', ':Gen Chat<CR>', { desc = 'Gen: Chat' })
+map('n', '<C-t>', '<cmd>terminal<CR>', { noremap = true, silent = true, desc = 'Open terminal' })
+map('n', '<leader>ht', '<cmd>split | terminal<CR>', { noremap = true, silent = true, desc = 'Open terminal horizontal' })
+map('n', '<leader>vt', '<cmd>vsplit | terminal<CR>', { noremap = true, silent = true, desc = 'Open terminal vertical' })
+map('t', '<Esc>', '<C-\\><C-n>', { noremap = true, silent = true, desc = 'Exit terminal mode' })
+map('t', '<C-h>', '<C-\\><C-n><C-w>h', { noremap = true, silent = true, desc = 'Move to window left from terminal' })
+map('t', '<C-j>', '<C-\\><C-n><C-w>j', { noremap = true, silent = true, desc = 'Move to window below from terminal' })
+map('t', '<C-k>', '<C-\\><C-n><C-w>k', { noremap = true, silent = true, desc = 'Move to window above from terminal' })
+map('t', '<C-l>', '<C-\\><C-n><C-w>l', { noremap = true, silent = true, desc = 'Move to window right from terminal' })
 
--- Gen.nvim - Code completion prompts
-map({ 'n', 'v' }, '<leader>gk', ':Gen Complete_Code<CR>', { desc = 'Gen: Complete code' })
-map({ 'n', 'v' }, '<leader>ge', ':Gen Explain_Code<CR>', { desc = 'Gen: Explain' })
-map({ 'n', 'v' }, '<leader>gf', ':Gen Fix_Code<CR>', { desc = 'Gen: Fix bugs' })
-map({ 'n', 'v' }, '<leader>go', ':Gen Optimize_Code<CR>', { desc = 'Gen: Optimize' })
-map({ 'n', 'v' }, '<leader>gr', ':Gen Refactor_Code<CR>', { desc = 'Gen: Refactor' })
-map({ 'n', 'v' }, '<leader>gt', ':Gen Generate_Tests<CR>', { desc = 'Gen: Generate tests' })
-map({ 'n', 'v' }, '<leader>gb', ':Gen Find_Bugs<CR>', { desc = 'Gen: Find bugs' })
-map({ 'n', 'v' }, '<leader>gd', ':Gen Generate_Docs<CR>', { desc = 'Gen: Generate docs' })
-map({ 'n', 'v' }, '<leader>gv', ':Gen Review_Code<CR>', { desc = 'Gen: Review code' })
-map({ 'n', 'v' }, '<leader>gx', ':Gen Add_Comments<CR>', { desc = 'Gen: Add comments' })
+-- ============================================================================
+-- AI Assistants
+-- ============================================================================
 
--- Avante AI - Advanced assistant (use for complex tasks)
+-- Gen.nvim - Fast AI prompts (local Ollama)
+map({ 'n', 'v' }, '<leader>gg', '<cmd>Gen<CR>', { noremap = true, silent = true, desc = 'Gen: Show all prompts' })
+map({ 'n', 'v' }, '<leader>gc', '<cmd>Gen Chat<CR>', { noremap = true, silent = true, desc = 'Gen: Chat' })
+map({ 'n', 'v' }, '<leader>gk', '<cmd>Gen Complete_Code<CR>', { noremap = true, silent = true, desc = 'Gen: Complete code' })
+map({ 'n', 'v' }, '<leader>ge', '<cmd>Gen Explain_Code<CR>', { noremap = true, silent = true, desc = 'Gen: Explain code' })
+map({ 'n', 'v' }, '<leader>gf', '<cmd>Gen Fix_Code<CR>', { noremap = true, silent = true, desc = 'Gen: Fix bugs' })
+map({ 'n', 'v' }, '<leader>go', '<cmd>Gen Optimize_Code<CR>', { noremap = true, silent = true, desc = 'Gen: Optimize code' })
+map({ 'n', 'v' }, '<leader>gr', '<cmd>Gen Refactor_Code<CR>', { noremap = true, silent = true, desc = 'Gen: Refactor code' })
+map({ 'n', 'v' }, '<leader>gt', '<cmd>Gen Generate_Tests<CR>', { noremap = true, silent = true, desc = 'Gen: Generate tests' })
+map({ 'n', 'v' }, '<leader>gb', '<cmd>Gen Find_Bugs<CR>', { noremap = true, silent = true, desc = 'Gen: Find bugs' })
+map({ 'n', 'v' }, '<leader>gd', '<cmd>Gen Generate_Docs<CR>', { noremap = true, silent = true, desc = 'Gen: Generate docs' })
+map({ 'n', 'v' }, '<leader>gv', '<cmd>Gen Review_Code<CR>', { noremap = true, silent = true, desc = 'Gen: Review code' })
+map({ 'n', 'v' }, '<leader>gx', '<cmd>Gen Add_Comments<CR>', { noremap = true, silent = true, desc = 'Gen: Add comments' })
+
+-- Avante.nvim - Advanced AI assistant (local Ollama)
+-- Keymaps are defined in the plugin config:
 -- <leader>aa - Toggle Avante chat
 -- <leader>ar - Refresh Avante
 -- <leader>ae - Edit with AI
 -- See :h avante-keymaps for full list
+
+-- ============================================================================
+-- IDE Features - Testing (Neotest)
+-- ============================================================================
+
+map('n', '<leader>tr', function()
+  require('neotest').run.run()
+end, { noremap = true, silent = true, desc = 'Test: Run nearest' })
+
+map('n', '<leader>tf', function()
+  require('neotest').run.run(vim.fn.expand '%')
+end, { noremap = true, silent = true, desc = 'Test: Run file' })
+
+map('n', '<leader>ta', function()
+  require('neotest').run.run(vim.fn.getcwd())
+end, { noremap = true, silent = true, desc = 'Test: Run all' })
+
+map('n', '<leader>ts', function()
+  require('neotest').summary.toggle()
+end, { noremap = true, silent = true, desc = 'Test: Toggle summary' })
+
+map('n', '<leader>to', function()
+  require('neotest').output.open { enter = true }
+end, { noremap = true, silent = true, desc = 'Test: Open output' })
+
+map('n', '<leader>tp', function()
+  require('neotest').output_panel.toggle()
+end, { noremap = true, silent = true, desc = 'Test: Toggle output panel' })
+
+map('n', '<leader>tS', function()
+  require('neotest').run.stop()
+end, { noremap = true, silent = true, desc = 'Test: Stop' })
+
+map('n', '<leader>td', function()
+  require('neotest').run.run { strategy = 'dap' }
+end, { noremap = true, silent = true, desc = 'Test: Debug nearest' })
+
+map('n', '[t', function()
+  require('neotest').jump.prev { status = 'failed' }
+end, { noremap = true, silent = true, desc = 'Jump to previous failed test' })
+
+map('n', ']t', function()
+  require('neotest').jump.next { status = 'failed' }
+end, { noremap = true, silent = true, desc = 'Jump to next failed test' })
+
+-- ============================================================================
+-- IDE Features - Code Symbols/Outline (Aerial)
+-- ============================================================================
+
+map('n', '<leader>a', '<cmd>AerialToggle!<CR>', { noremap = true, silent = true, desc = 'Symbols: Toggle outline' })
+map('n', '<leader>A', '<cmd>AerialNavToggle<CR>', { noremap = true, silent = true, desc = 'Symbols: Toggle navigation' })
+map('n', '[s', '<cmd>AerialPrev<CR>', { noremap = true, silent = true, desc = 'Jump to previous symbol' })
+map('n', ']s', '<cmd>AerialNext<CR>', { noremap = true, silent = true, desc = 'Jump to next symbol' })
+
+-- ============================================================================
+-- IDE Features - Project Management (project.nvim)
+-- ============================================================================
+
+map('n', '<leader>fp', function()
+  local projects = require('project_nvim').get_recent_projects()
+  local items = {}
+  for _, project in ipairs(projects) do
+    local name = vim.fn.fnamemodify(project, ':t')
+    table.insert(items, {
+      text = name .. ' (' .. project .. ')',
+      path = project,
+    })
+  end
+  require('mini.pick').start {
+    source = {
+      items = items,
+      name = 'Projects',
+      choose = function(item)
+        if item then
+          vim.cmd('cd ' .. item.path)
+          vim.notify('Switched to project: ' .. item.path, vim.log.levels.INFO)
+        end
+      end,
+    },
+  }
+end, { noremap = true, silent = true, desc = 'Project: Find projects' })
+
+map('n', '<leader>pr', function()
+  local project_root = require('project_nvim.project').get_project_root()
+  if project_root then
+    vim.notify('Project root: ' .. project_root, vim.log.levels.INFO)
+  else
+    vim.notify('No project root found', vim.log.levels.WARN)
+  end
+end, { noremap = true, silent = true, desc = 'Project: Show root' })
+
+map('n', '<leader>pc', function()
+  local project_root = require('project_nvim.project').get_project_root()
+  if project_root then
+    vim.cmd('cd ' .. project_root)
+    vim.notify('Changed to project root: ' .. project_root, vim.log.levels.INFO)
+  else
+    vim.notify('No project root found', vim.log.levels.WARN)
+  end
+end, { noremap = true, silent = true, desc = 'Project: Change to root' })
+
+-- ============================================================================
+-- IDE Features - Build/Task System (Overseer)
+-- ============================================================================
+
+map('n', '<leader>ot', '<cmd>OverseerToggle<CR>', { noremap = true, silent = true, desc = 'Task: Toggle list' })
+map('n', '<leader>or', '<cmd>OverseerRun<CR>', { noremap = true, silent = true, desc = 'Task: Run' })
+map('n', '<leader>oo', '<cmd>OverseerOpen<CR>', { noremap = true, silent = true, desc = 'Task: Open' })
+map('n', '<leader>oc', '<cmd>OverseerClose<CR>', { noremap = true, silent = true, desc = 'Task: Close' })
+map('n', '<leader>oq', '<cmd>OverseerQuickAction<CR>', { noremap = true, silent = true, desc = 'Task: Quick action' })
+map('n', '<leader>oi', '<cmd>OverseerInfo<CR>', { noremap = true, silent = true, desc = 'Task: Info' })
+map('n', '<leader>ob', '<cmd>OverseerBuild<CR>', { noremap = true, silent = true, desc = 'Task: Build' })
+map('n', '<leader>ol', '<cmd>OverseerLoadBundle<CR>', { noremap = true, silent = true, desc = 'Task: Load bundle' })
+map('n', '<leader>os', '<cmd>OverseerSaveBundle<CR>', { noremap = true, silent = true, desc = 'Task: Save bundle' })
+map('n', '<leader>od', '<cmd>OverseerDeleteBundle<CR>', { noremap = true, silent = true, desc = 'Task: Delete bundle' })
+map('n', '<leader>oa', '<cmd>OverseerTaskAction<CR>', { noremap = true, silent = true, desc = 'Task: Action' })
+map('n', '<leader>oC', '<cmd>OverseerClearCache<CR>', { noremap = true, silent = true, desc = 'Task: Clear cache' })
+
+-- ============================================================================
+-- IDE Features - Advanced Search/Replace (Spectre)
+-- ============================================================================
+
+map('n', '<leader>S', function()
+  require('spectre').toggle()
+end, { noremap = true, silent = true, desc = 'Search: Toggle Spectre' })
+
+map('n', '<leader>sw', function()
+  require('spectre').open_visual { select_word = true }
+end, { noremap = true, silent = true, desc = 'Search: Current word' })
+
+map('v', '<leader>sw', function()
+  require('spectre').open_visual()
+end, { noremap = true, silent = true, desc = 'Search: Selection' })
+
+map('n', '<leader>sp', function()
+  require('spectre').open_file_search { select_word = true }
+end, { noremap = true, silent = true, desc = 'Search: In current file' })
+
+-- ============================================================================
+-- IDE Features - Debugging (DAP)
+-- ============================================================================
+
+map('n', '<leader>db', function()
+  require('dap').toggle_breakpoint()
+end, { noremap = true, silent = true, desc = 'Debug: Toggle breakpoint' })
+
+map('n', '<leader>dB', function()
+  require('dap').set_breakpoint(vim.fn.input 'Breakpoint condition: ')
+end, { noremap = true, silent = true, desc = 'Debug: Set conditional breakpoint' })
+
+map('n', '<leader>dc', function()
+  require('dap').continue()
+end, { noremap = true, silent = true, desc = 'Debug: Continue' })
+
+map('n', '<leader>di', function()
+  require('dap').step_into()
+end, { noremap = true, silent = true, desc = 'Debug: Step into' })
+
+map('n', '<leader>do', function()
+  require('dap').step_over()
+end, { noremap = true, silent = true, desc = 'Debug: Step over' })
+
+map('n', '<leader>dO', function()
+  require('dap').step_out()
+end, { noremap = true, silent = true, desc = 'Debug: Step out' })
+
+map('n', '<leader>dr', function()
+  require('dap').repl.open()
+end, { noremap = true, silent = true, desc = 'Debug: Open REPL' })
+
+map('n', '<leader>dl', function()
+  require('dap').run_last()
+end, { noremap = true, silent = true, desc = 'Debug: Run last' })
+
+map('n', '<leader>dt', function()
+  require('dap').terminate()
+end, { noremap = true, silent = true, desc = 'Debug: Terminate' })
+
+map('n', '<leader>du', function()
+  require('dapui').toggle()
+end, { noremap = true, silent = true, desc = 'Debug: Toggle UI' })
