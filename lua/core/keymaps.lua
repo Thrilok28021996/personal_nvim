@@ -282,7 +282,7 @@ end, { noremap = true, silent = true, desc = 'Search: Selection' })
 map('n', '<leader>sp', function()
   require('spectre').open_file_search { select_word = true }
 end, { noremap = true, silent = true, desc = 'Search: In current file' })
-
+map('n', '<leader>sr', [[:%s///gc<Left><Left><Left>]], { desc = 'Prompted search and replace with confirmation' })
 -- ============================================================================
 -- IDE Features - Debugging (DAP)
 -- ============================================================================
