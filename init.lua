@@ -15,12 +15,16 @@ vim.opt.rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup {
   require 'plugins.fileexplorer',
+  require 'plugins.neo-tree',
   require 'plugins.colorscheme',
   require 'plugins.which-key',
   require 'plugins.autoformat',
   require 'plugins.autocompletion',
   require 'plugins.language',
+  require 'plugins.navic',
   require 'plugins.mason',
+  require 'plugins.trouble',
+  require 'plugins.ufo',
   require 'plugins.debugging',
   require 'plugins.testing', -- Test runner (Neotest)
   require 'plugins.symbols', -- Code outline (Aerial)
@@ -31,6 +35,7 @@ require('lazy').setup {
 
   require 'plugins.git-signs',
   require 'plugins.lazygit',
+  require 'plugins.octo',
   require 'plugins.gen-nvim', -- Fast AI prompts
   require 'plugins.avante', -- Advanced AI assistant
 
