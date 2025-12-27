@@ -98,3 +98,31 @@ vim.g.loaded_python3_provider = 0
 
 -- Disable Ruby provider (not needed)
 vim.g.loaded_ruby_provider = 0
+
+-- ============================================================================
+-- Markdown-specific settings
+-- ============================================================================
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'markdown',
+  callback = function()
+    -- Enable spell checking
+    vim.opt_local.spell = true
+    vim.opt_local.spelllang = 'en_us'
+
+    -- Better text wrapping
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true
+    vim.opt_local.breakindent = true
+
+    -- Text width for formatting
+    vim.opt_local.textwidth = 80
+
+    -- Conceal markdown syntax when not on current line
+    vim.opt_local.conceallevel = 2
+    vim.opt_local.concealcursor = 'nc'
+
+    -- Auto-format tables and lists
+    vim.opt_local.formatoptions:append 'ro'
+  end,
+})

@@ -40,4 +40,9 @@ require('lazy').setup {
   require 'notemd.markdown-preview',
   require 'notemd.img-clip',
   require 'notemd.rendering-markdown',
+  require 'notemd.markdown-table',
+  require 'notemd.headlines',
+  require 'notemd.mkdnflow',
+  require 'notemd.markdown-toc',
+  require 'notemd.zen-mode',
 }

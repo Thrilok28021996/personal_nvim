@@ -39,7 +39,7 @@ map({ 'n', 'v' }, '<leader>y', [["+y]], { noremap = true, silent = true, desc = 
 map('n', '<leader>Y', [["+Y]], { noremap = true, silent = true, desc = 'Yank line to system clipboard' })
 
 -- Search and replace with confirmation
-map('n', '<leader>sr', [[:%s///gc<Left><Left><Left>]], { noremap = true, silent = true, desc = 'Search and replace' })
+map('n', '<leader>sr', [[:%s///gc<Left><Left><Left>]], { desc = 'Prompted search and replace with confirmation' })
 
 -- ============================================================================
 -- Buffer Management
@@ -59,7 +59,7 @@ map('n', '<leader>bq', '<cmd>bdel!<CR>', { noremap = true, silent = true, desc =
 
 -- Split windows
 map('n', '<leader>v', '<C-w>v', { noremap = true, silent = true, desc = 'Split window vertically' })
-map('n', '<leader>h', '<C-w>s', { noremap = true, silent = true, desc = 'Split window horizontally' })
+map('n', '<leader>wh', '<C-w>s', { noremap = true, silent = true, desc = 'Split window horizontally' })
 map('n', '<leader>we', '<C-w>=', { noremap = true, silent = true, desc = 'Equal window sizes' })
 map('n', '<leader>wc', '<cmd>close<CR>', { noremap = true, silent = true, desc = 'Close window' })
 
@@ -282,7 +282,7 @@ end, { noremap = true, silent = true, desc = 'Search: Selection' })
 map('n', '<leader>sp', function()
   require('spectre').open_file_search { select_word = true }
 end, { noremap = true, silent = true, desc = 'Search: In current file' })
-map('n', '<leader>sr', [[:%s///gc<Left><Left><Left>]], { desc = 'Prompted search and replace with confirmation' })
+
 -- ============================================================================
 -- IDE Features - Debugging (DAP)
 -- ============================================================================
@@ -326,3 +326,91 @@ end, { noremap = true, silent = true, desc = 'Debug: Terminate' })
 map('n', '<leader>du', function()
   require('dapui').toggle()
 end, { noremap = true, silent = true, desc = 'Debug: Toggle UI' })
+
+-- ============================================================================
+-- Markdown - Preview & TOC
+-- ============================================================================
+
+map('n', '<leader>mp', '<cmd>PeekOpen<CR>', { noremap = true, silent = true, desc = 'Preview: Open' })
+map('n', '<leader>mc', '<cmd>PeekClose<CR>', { noremap = true, silent = true, desc = 'Preview: Close' })
+
+-- ============================================================================
+-- Markdown-specific keymaps (only active in markdown files)
+-- ============================================================================
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'markdown',
+  callback = function()
+    local opts = { buffer = true, noremap = true, silent = true }
+
+    -- Formatting (Visual mode) - Use Ctrl for common editor shortcuts
+    vim.keymap.set('v', '<C-b>', function()
+      vim.cmd "normal! `<i**`>la**"
+    end, vim.tbl_extend('force', opts, { desc = 'Bold text' }))
+
+    vim.keymap.set('v', '<C-i>', function()
+      vim.cmd "normal! `<i*`>la*"
+    end, vim.tbl_extend('force', opts, { desc = 'Italic text' }))
+
+    vim.keymap.set('v', '<leader>`', function()
+      vim.cmd "normal! `<i`<Esc>`>la`<Esc>"
+    end, vim.tbl_extend('force', opts, { desc = 'Inline code' }))
+
+    -- Insert commands - <leader>i prefix (insert - only in markdown buffers)
+    vim.keymap.set('n', '<leader>il', function()
+      local text = vim.fn.input 'Link text: '
+      local url = vim.fn.input 'URL: '
+      if url ~= '' then
+        local link = string.format('[%s](%s)', text, url)
+        vim.api.nvim_put({ link }, 'c', true, true)
+      end
+    end, vim.tbl_extend('force', opts, { desc = 'Insert: Link' }))
+
+    vim.keymap.set('n', '<leader>ii', function()
+      local alt = vim.fn.input 'Alt text: '
+      local url = vim.fn.input 'Image URL: '
+      if url ~= '' then
+        local line = string.format('![%s](%s)', alt, url)
+        vim.api.nvim_put({ line }, 'l', true, true)
+      end
+    end, vim.tbl_extend('force', opts, { desc = 'Insert: Image' }))
+
+    vim.keymap.set('n', '<leader>ic', function()
+      local lang = vim.fn.input 'Language: '
+      local lines = { '```' .. lang, '', '```' }
+      vim.api.nvim_put(lines, 'l', true, true)
+      vim.cmd 'normal! k'
+    end, vim.tbl_extend('force', opts, { desc = 'Insert: Code block' }))
+
+    vim.keymap.set('n', '<leader>it', function()
+      local cols = tonumber(vim.fn.input 'Columns: ') or 2
+      local header = '| ' .. string.rep('Column | ', cols)
+      local separator = '| ' .. string.rep('--- | ', cols)
+      local row = '| ' .. string.rep(' | ', cols)
+      vim.api.nvim_put({ header, separator, row }, 'l', true, true)
+    end, vim.tbl_extend('force', opts, { desc = 'Insert: Table' }))
+
+    vim.keymap.set('n', '<leader>ih', function()
+      vim.api.nvim_put({ '---' }, 'l', true, true)
+    end, vim.tbl_extend('force', opts, { desc = 'Insert: Horizontal rule' }))
+
+    vim.keymap.set('n', '<leader>ix', function()
+      local text = vim.fn.input 'Task: '
+      vim.api.nvim_put({ '- [ ] ' .. text }, 'l', true, true)
+    end, vim.tbl_extend('force', opts, { desc = 'Insert: Checkbox' }))
+
+    -- Headings - <leader>h prefix (heading)
+    for i = 1, 6 do
+      vim.keymap.set('n', '<leader>h' .. i, function()
+        local line = vim.api.nvim_get_current_line()
+        line = line:gsub('^#* *', '')
+        vim.api.nvim_set_current_line(string.rep('#', i) .. ' ' .. line)
+      end, vim.tbl_extend('force', opts, { desc = 'Heading: H' .. i }))
+    end
+
+    -- TOC commands - <leader>m prefix (markdown)
+    vim.keymap.set('n', '<leader>mg', '<cmd>GenTocGFM<CR>', vim.tbl_extend('force', opts, { desc = 'Markdown: Generate TOC' }))
+    vim.keymap.set('n', '<leader>mu', '<cmd>UpdateToc<CR>', vim.tbl_extend('force', opts, { desc = 'Markdown: Update TOC' }))
+    vim.keymap.set('n', '<leader>md', '<cmd>RemoveToc<CR>', vim.tbl_extend('force', opts, { desc = 'Markdown: Delete TOC' }))
+  end,
+})
