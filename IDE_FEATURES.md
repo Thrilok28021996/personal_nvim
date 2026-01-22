@@ -58,29 +58,7 @@
 
 ---
 
-### 3. UFO (Smart Code Folding)
-**Plugin**: `kevinhwang91/nvim-ufo`
-
-**Keybindings:**
-- `zR` - Open all folds
-- `zM` - Close all folds
-- `zr` - Fold less (open one level)
-- `zm` - Fold more (close one level)
-- `zp` - Peek folded lines under cursor
-- `zo` - Open fold under cursor (default)
-- `zc` - Close fold under cursor (default)
-
-**Features:**
-- LSP-based intelligent folding
-- Treesitter fallback
-- Beautiful fold preview with line counts
-- Fold column with visual indicators (▶/▼)
-- Virtual text showing number of folded lines
-- Preserves fold state
-
----
-
-### 4. Navic (Breadcrumb Navigation)
+### 3. Navic (Breadcrumb Navigation)
 **Plugin**: `SmiteshP/nvim-navic`
 
 **Location:** Integrated into statusline (bottom of screen)

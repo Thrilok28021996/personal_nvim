@@ -24,7 +24,6 @@ require('lazy').setup {
   require 'plugins.navic',
   require 'plugins.mason',
   require 'plugins.trouble',
-  require 'plugins.ufo',
   require 'plugins.debugging',
   require 'plugins.testing', -- Test runner (Neotest)
   require 'plugins.symbols', -- Code outline (Aerial)
