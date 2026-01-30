@@ -1,128 +1,163 @@
--- Make line numbers default
+-- Core Neovim Options
+
+-- Line numbers
 vim.opt.number = true
 vim.opt.relativenumber = true
 
--- Enable mouse mode, can be useful for resizing splits for example!
+-- Mouse & UI
 vim.opt.mouse = 'a'
-
--- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
+vim.opt.termguicolors = true
+vim.opt.cursorline = true
+vim.opt.signcolumn = 'yes'
+vim.opt.scrolloff = 10
+vim.opt.sidescrolloff = 8
 
--- Sync clipboard between OS and Neovim.
---  Schedule the setting after `UiEnter` because it can increase startup-time.
---  Remove this option if you want your OS clipboard to remain independent.
---  See `:help 'clipboard'`
+-- Window borders (Neovim 0.11+)
+-- Default border for all floating windows
+vim.o.winborder = 'rounded'
+
+-- Native Folding (Neovim 0.10+)
+vim.opt.foldmethod = 'expr'
+vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.opt.foldcolumn = '1' -- Show fold column for better visibility
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
+vim.opt.foldenable = true
+
+-- Custom foldtext for better fold display (0.11+)
+function _G.custom_foldtext()
+  local line = vim.fn.getline(vim.v.foldstart)
+  local line_count = vim.v.foldend - vim.v.foldstart + 1
+  return string.format('  %s ... (%d lines)', line, line_count)
+end
+vim.opt.foldtext = 'v:lua.custom_foldtext()'
+
+-- Native Completion (Neovim 0.11+)
+vim.opt.completeopt = { 'menu', 'menuone', 'noselect', 'fuzzy' }
+
+-- Command-line completion enhancements (0.11+)
+vim.opt.wildmenu = true
+vim.opt.wildmode = 'longest:full,full'
+vim.opt.wildoptions = 'pum,fuzzy' -- Popup menu with fuzzy matching
+vim.opt.wildignorecase = true
+vim.opt.wildignore = {
+  '*.o', '*.obj', '*~', '*.pyc', '*.class',
+  '*/.git/*', '*/.hg/*', '*/.svn/*',
+  '*/node_modules/*', '*/__pycache__/*',
+  '*.swp', '*.swo', '*.bak',
+}
+
+-- Auto-save on buffer switch/window leave (0.11+)
+vim.opt.autowrite = true
+vim.opt.autowriteall = false -- Don't save on suspend
+
+-- Status column for unified left-side UI (0.11+)
+-- Shows line numbers, fold markers, and signs in one column
+vim.opt.statuscolumn = '%s%=%{v:relnum?v:relnum:v:lnum} '
+
+-- Clipboard (scheduled to reduce startup time)
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'
 end)
 
--- Enable break indent
+-- Indentation
 vim.opt.breakindent = true
+vim.opt.smartindent = true
+vim.opt.expandtab = true
+vim.opt.shiftwidth = 2
+vim.opt.tabstop = 2
 
--- Save undo history
+-- Undo & Backup
 vim.opt.undofile = true
+vim.opt.swapfile = false
+vim.opt.backup = false
 
--- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
+-- Search
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
+vim.opt.hlsearch = true
+vim.opt.incsearch = true
 
--- Keep signcolumn on by default
-vim.opt.signcolumn = 'yes'
-
--- Decrease update time
+-- Performance
 vim.opt.updatetime = 250
-
--- Decrease mapped sequence wait time
 vim.opt.timeoutlen = 300
+vim.opt.lazyredraw = true -- Improves performance during macros/commands
 
--- Configure how new splits should be opened
+-- Splits
 vim.opt.splitright = true
 vim.opt.splitbelow = true
 
--- Sets how neovim will display certain whitespace characters in the editor.
---  See `:help 'list'`
---  and `:help 'listchars'`
+-- Display
 vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-
--- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
+vim.opt.wrap = false
 
--- Show which line your cursor is on
-vim.opt.cursorline = true
+-- Disable unused providers
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
 
--- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
+-- Create augroup for better organization
+local augroup = vim.api.nvim_create_augroup('UserConfigOptions', { clear = true })
 
--- Built-in TODO comment highlighting
+-- Markdown-specific settings
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = '*',
+  group = augroup,
+  pattern = 'markdown',
   callback = function()
-    vim.cmd [[
-      syntax match TodoComment /\<\(TODO\|FIXME\|NOTE\|HACK\|XXX\|BUG\|WARN\)\>/ containedin=.*Comment.*
-      highlight TodoComment guifg=#FF6B6B guibg=NONE gui=bold
-    ]]
+    vim.opt_local.spell = true
+    vim.opt_local.spelllang = 'en_us'
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true
+    vim.opt_local.textwidth = 80
+    vim.opt_local.conceallevel = 2
   end,
 })
 
--- Enable true color support
-vim.opt.termguicolors = true
-
--- Enable italics for various syntax elements
-local italics = {
-  'Comment',
-  'Keyword',
-  'Type',
-  'Function',
-  'String',
-  'Conditional',
-  'Repeat',
-  'Identifier',
-}
-for _, group in ipairs(italics) do
-  vim.cmd(string.format('highlight %s cterm=italic gui=italic', group))
-end
-
--- ============================================================================
--- Disable Unused Providers (reduces startup warnings)
--- ============================================================================
-
--- Disable Node.js provider (not needed for Python/C++ IDE)
-vim.g.loaded_node_provider = 0
-
--- Disable Perl provider (not needed)
-vim.g.loaded_perl_provider = 0
-
--- Disable Python provider (we use LSP for Python, not remote plugins)
-vim.g.loaded_python3_provider = 0
-
--- Disable Ruby provider (not needed)
-vim.g.loaded_ruby_provider = 0
-
--- ============================================================================
--- Markdown-specific settings
--- ============================================================================
-
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'markdown',
+-- Terminal improvements (Neovim 0.11+)
+vim.api.nvim_create_autocmd('TermOpen', {
+  group = augroup,
   callback = function()
-    -- Enable spell checking
-    vim.opt_local.spell = true
-    vim.opt_local.spelllang = 'en_us'
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+    vim.opt_local.signcolumn = 'no'
+    vim.opt_local.scrolloff = 0
+  end,
+})
 
-    -- Better text wrapping
-    vim.opt_local.wrap = true
-    vim.opt_local.linebreak = true
-    vim.opt_local.breakindent = true
+-- Persistent cursor position and folds (native)
+vim.api.nvim_create_autocmd('BufReadPost', {
+  group = augroup,
+  callback = function()
+    local mark = vim.api.nvim_buf_get_mark(0, '"')
+    local lcount = vim.api.nvim_buf_line_count(0)
+    if mark[1] > 0 and mark[1] <= lcount then
+      pcall(vim.api.nvim_win_set_cursor, 0, mark)
+    end
+  end,
+})
 
-    -- Text width for formatting
-    vim.opt_local.textwidth = 80
+-- Auto-save views for folds
+vim.opt.viewoptions = 'cursor,folds,slash,unix'
+vim.api.nvim_create_autocmd('BufWinLeave', {
+  group = augroup,
+  pattern = '*.*',
+  callback = function()
+    if vim.bo.buftype == '' and vim.fn.expand '%' ~= '' then
+      vim.cmd 'silent! mkview'
+    end
+  end,
+})
 
-    -- Conceal markdown syntax when not on current line
-    vim.opt_local.conceallevel = 2
-    vim.opt_local.concealcursor = 'nc'
-
-    -- Auto-format tables and lists
-    vim.opt_local.formatoptions:append 'ro'
+vim.api.nvim_create_autocmd('BufWinEnter', {
+  group = augroup,
+  pattern = '*.*',
+  callback = function()
+    if vim.bo.buftype == '' and vim.fn.expand '%' ~= '' then
+      vim.cmd 'silent! loadview'
+    end
   end,
 })

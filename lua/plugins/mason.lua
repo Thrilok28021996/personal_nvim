@@ -35,6 +35,9 @@ return {
         'clangd', -- C/C++ Language server
         'clang-format', -- C/C++ formatter
         'codelldb', -- C/C++ debugger
+
+        -- Lua tools
+        'lua-language-server', -- Lua LSP for Neovim config
       },
 
       -- Automatically install tools on startup

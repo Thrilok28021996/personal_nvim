@@ -21,7 +21,7 @@ return {
         repl = 'r',
         toggle = 't',
       },
-      expand_lines = vim.fn.has 'nvim-0.7' == 1,
+      expand_lines = true, -- Always true in Neovim 0.11+
       layouts = {
         {
           elements = {
@@ -89,7 +89,7 @@ return {
           return variable.name .. ' = ' .. variable.value
         end
       end,
-      virt_text_pos = vim.fn.has 'nvim-0.10' == 1 and 'inline' or 'eol',
+      virt_text_pos = 'inline', -- Always inline in Neovim 0.11+
       all_frames = false,
       virt_lines = false,
       virt_text_win_col = nil,
@@ -117,35 +117,41 @@ return {
       program = '${file}',
       args = function()
         local args_string = vim.fn.input 'Arguments: '
-        return vim.split(args_string, ' +')
+        return vim.split(args_string, '%s+')
       end,
       console = 'integratedTerminal',
       cwd = '${workspaceFolder}',
     })
 
-    -- Node.js debugging
-    dap.adapters.node2 = {
-      type = 'executable',
-      command = 'node',
-      args = { os.getenv 'HOME' .. '/.local/share/nvim/mason/packages/node-debug2-adapter/out/src/nodeDebug.js' },
+    -- Node.js debugging (modern pwa-node adapter)
+    -- Install: npm install -g js-debug OR download from https://github.com/microsoft/vscode-js-debug/releases
+    dap.adapters['pwa-node'] = {
+      type = 'server',
+      host = 'localhost',
+      port = '${port}',
+      executable = {
+        command = 'node',
+        -- Update this path if you installed js-debug elsewhere
+        args = { vim.fn.stdpath 'data' .. '/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js', '${port}' },
+      },
     }
 
     dap.configurations.javascript = {
       {
-        name = 'Launch',
-        type = 'node2',
+        name = 'Launch file',
+        type = 'pwa-node',
         request = 'launch',
         program = '${file}',
-        cwd = vim.fn.getcwd(),
+        cwd = '${workspaceFolder}',
         sourceMaps = true,
-        protocol = 'inspector',
         console = 'integratedTerminal',
       },
       {
         name = 'Attach to process',
-        type = 'node2',
+        type = 'pwa-node',
         request = 'attach',
         processId = require('dap.utils').pick_process,
+        cwd = '${workspaceFolder}',
       },
     }
 
@@ -174,7 +180,7 @@ return {
         stopOnEntry = false,
         args = function()
           local args_string = vim.fn.input 'Arguments: '
-          return vim.split(args_string, ' +')
+          return vim.split(args_string, '%s+')
         end,
         runInTerminal = false,
       },
@@ -182,15 +188,7 @@ return {
         name = 'Attach to process',
         type = 'codelldb',
         request = 'attach',
-        pid = function()
-          local handle = io.popen 'ps aux | grep -v grep'
-          if handle then
-            local result = handle:read '*a'
-            handle:close()
-            return vim.fn.input 'PID: '
-          end
-          return ''
-        end,
+        pid = require('dap.utils').pick_process,
         args = {},
       },
     }

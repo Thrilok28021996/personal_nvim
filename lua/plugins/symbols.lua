@@ -3,7 +3,6 @@ return {
     'stevearc/aerial.nvim',
     dependencies = {
       'nvim-treesitter/nvim-treesitter',
-      'echasnovski/mini.icons',
     },
     opts = {
       -- How to open aerial window

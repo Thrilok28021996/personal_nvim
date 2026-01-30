@@ -28,12 +28,18 @@ return {
         },
       }
 
-      -- Try to load C++ adapter (requires cpp treesitter parser)
+      -- Try to load C++ adapter (requires neotest-gtest plugin)
       local ok, gtest = pcall(require, 'neotest-gtest')
       if ok then
         table.insert(adapters, gtest.setup {})
       else
-        vim.notify('C++ treesitter parser not installed yet. Install with :TSInstall cpp', vim.log.levels.WARN)
+        vim.notify('neotest-gtest not available. C++ testing disabled.', vim.log.levels.INFO)
+      end
+
+      -- Only setup neotest if we have at least one adapter
+      if #adapters == 0 then
+        vim.notify('No neotest adapters found. Install neotest-python or neotest-gtest.', vim.log.levels.WARN)
+        return
       end
 
       require('neotest').setup {

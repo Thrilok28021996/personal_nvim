@@ -1,5 +1,6 @@
 require 'core.options'
 require 'core.keymaps'
+require 'core.macros'
 
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -9,44 +10,50 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     error('Error cloning lazy.nvim:\n' .. out)
   end
 end
----@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
--- NOTE: Here is where you install your plugins.
 require('lazy').setup {
-  require 'plugins.fileexplorer',
-  require 'plugins.neo-tree',
+  -- Core
   require 'plugins.colorscheme',
+  require 'plugins.comments',
+  require 'plugins.fileexplorer',
+  require 'plugins.misc',
   require 'plugins.which-key',
+  require 'plugins.mason',
+
+  -- LSP & Completion
+  require 'plugins.language',
   require 'plugins.autoformat',
   require 'plugins.autocompletion',
-  require 'plugins.language',
-  require 'plugins.navic',
-  require 'plugins.mason',
-  require 'plugins.trouble',
-  require 'plugins.debugging',
-  require 'plugins.testing', -- Test runner (Neotest)
-  require 'plugins.symbols', -- Code outline (Aerial)
-  require 'plugins.project', -- Project management
-  require 'plugins.tasks', -- Build/task system (Overseer)
-  require 'plugins.search-replace', -- Advanced search/replace (Spectre)
-  require 'plugins.misc',
+  require 'plugins.linting',
 
+  -- IDE Features
+  require 'plugins.symbols',
+  require 'plugins.debugging',
+  require 'plugins.testing',
+  require 'plugins.tasks',
+  require 'plugins.project',
+  require 'plugins.search-replace',
+
+  -- Git
   require 'plugins.git-signs',
   require 'plugins.lazygit',
   require 'plugins.octo',
-  require 'plugins.gen-nvim', -- Fast AI prompts
-  require 'plugins.avante', -- Advanced AI assistant
 
-  -- INFO: Note Making Plugins.
+  -- AI
+  require 'plugins.codecompanion',
 
+  -- Markdown
   require 'notemd.tree-sitter',
   require 'notemd.markdown-preview',
   require 'notemd.img-clip',
   require 'notemd.rendering-markdown',
-  require 'notemd.markdown-table',
-  require 'notemd.headlines',
   require 'notemd.mkdnflow',
   require 'notemd.markdown-toc',
   require 'notemd.zen-mode',
+
+  -- Extra
+  require 'plugins.undotree',
+  require 'plugins.multicursor',
+  require 'plugins.todo-comments',
 }

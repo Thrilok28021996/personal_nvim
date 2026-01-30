@@ -1,12 +1,12 @@
 return {
   'MeanderingProgrammer/render-markdown.nvim',
   dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
-  ft = 'markdown',
+  ft = { 'markdown', 'Avante' },
   ---@module 'render-markdown'
   ---@type render.md.UserConfig
   config = function()
     require('render-markdown').setup {
-      -- Enable rendering in both normal and insert modes
+      file_types = { 'markdown', 'Avante' },
       render_modes = { 'n', 'c' },
 
       -- Heading icons
@@ -79,6 +79,11 @@ return {
 
       -- Disable latex support (not needed, removes warnings)
       latex = { enabled = false },
+
+      -- Enable blink.cmp completion integration
+      completions = {
+        blink = { enabled = true },
+      },
     }
   end,
 }

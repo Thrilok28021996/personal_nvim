@@ -2,18 +2,8 @@ return {
   {
     'stevearc/overseer.nvim',
     opts = {
-      -- Strategy for running tasks
-      strategy = {
-        'toggleterm',
-        -- Use terminal at bottom
-        direction = 'horizontal',
-        -- Close terminal when task completes
-        close_on_exit = false,
-        -- Don't open terminal automatically
-        open_on_start = true,
-        -- Hidden by default
-        hidden = false,
-      },
+      -- Strategy for running tasks (jobstart uses Neovim's native job control)
+      strategy = 'jobstart',
 
       -- Templates to use
       templates = { 'builtin', 'user' },
@@ -105,51 +95,26 @@ return {
 
       -- Keymaps are in lua/core/keymaps.lua
 
-      -- Add some common task templates
+      -- Common task templates (simplified - use overseer auto-detection for most)
       overseer.register_template {
-        name = 'Python: Run current file',
+        name = 'Run: Current file',
         builder = function()
+          local file = vim.fn.expand '%:p'
+          local ft = vim.bo.filetype
+          local cmd = ft == 'python' and 'python3' or ft == 'lua' and 'lua' or 'node'
           return {
-            cmd = { 'python3' },
-            args = { vim.fn.expand '%:p' },
+            cmd = { cmd },
+            args = { file },
             components = { 'default' },
           }
         end,
         condition = {
-          filetype = { 'python' },
+          filetype = { 'python', 'lua', 'javascript' },
         },
       }
 
       overseer.register_template {
-        name = 'Python: pytest current file',
-        builder = function()
-          return {
-            cmd = { 'pytest' },
-            args = { vim.fn.expand '%:p', '-v' },
-            components = { 'default' },
-          }
-        end,
-        condition = {
-          filetype = { 'python' },
-        },
-      }
-
-      overseer.register_template {
-        name = 'Python: pytest all',
-        builder = function()
-          return {
-            cmd = { 'pytest' },
-            args = { '-v' },
-            components = { 'default' },
-          }
-        end,
-        condition = {
-          filetype = { 'python' },
-        },
-      }
-
-      overseer.register_template {
-        name = 'C++: Build with make',
+        name = 'Build: Make',
         builder = function()
           return {
             cmd = { 'make' },
@@ -162,46 +127,17 @@ return {
       }
 
       overseer.register_template {
-        name = 'C++: Run executable',
+        name = 'Test: Current project',
         builder = function()
-          -- Get the executable name (assuming it's the basename of current file)
-          local file = vim.fn.expand '%:t:r'
+          local ft = vim.bo.filetype
+          local cmd = ft == 'python' and 'pytest' or 'make test'
           return {
-            cmd = { './' .. file },
+            cmd = vim.split(cmd, ' '),
             components = { 'default' },
           }
         end,
         condition = {
-          filetype = { 'cpp', 'c' },
-        },
-      }
-
-      overseer.register_template {
-        name = 'C++: Build and run',
-        builder = function()
-          local file = vim.fn.expand '%:t:r'
-          return {
-            cmd = { 'sh' },
-            args = { '-c', 'make && ./' .. file },
-            components = { 'default' },
-          }
-        end,
-        condition = {
-          filetype = { 'cpp', 'c' },
-        },
-      }
-
-      overseer.register_template {
-        name = 'CMake: Build',
-        builder = function()
-          return {
-            cmd = { 'cmake' },
-            args = { '--build', 'build' },
-            components = { 'default' },
-          }
-        end,
-        condition = {
-          filetype = { 'cpp', 'c' },
+          filetype = { 'python', 'c', 'cpp' },
         },
       }
     end,
