@@ -8,11 +8,10 @@ return {
   opts = {
     adapters = {
       ollama = function()
-        local model_name = vim.fn.input('Enter Ollama model (default qwen2.5-coder:latest): ', 'qwen2.5-coder:latest')
         return require('codecompanion.adapters').extend('ollama', {
           schema = {
             model = {
-              default = model_name,
+              default = 'qwen2.5-coder:latest',
             },
           },
         })
@@ -27,23 +26,20 @@ return {
       chat = {
         window = {
           layout = 'float',
-          -- dynamically set width and height relative to editor size
           width = function()
-            return math.floor(vim.o.columns * 0.5)
+            return math.floor(vim.o.columns * 0.7)
           end,
           height = function()
-            return math.floor(vim.o.lines * 0.4)
+            return math.floor(vim.o.lines * 0.7)
           end,
           relative = 'editor',
         },
       },
+      inline = {
+        layout = 'buffer',
+      },
     },
   },
-  keys = {
-    { '<leader>cc', '<cmd>CodeCompanionChat Toggle<cr>', desc = 'Toggle Chat' },
-    { '<leader>ca', '<cmd>CodeCompanionActions<cr>', desc = 'Actions' },
-    { '<leader>ci', '<cmd>CodeCompanion<cr>', desc = 'Inline Prompt' },
-    { '<leader>cx', '<cmd>CodeCompanionChat Add<cr>', mode = 'v', desc = 'Add to Chat' }, -- fixed unique leader
-  },
+  -- Keymaps are in lua/core/keymaps.lua (Section 8.8)
   cmd = { 'CodeCompanion', 'CodeCompanionChat', 'CodeCompanionActions' },
 }

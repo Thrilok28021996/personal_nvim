@@ -22,22 +22,23 @@ return {
     -- Key mappings groups
     spec = {
       { '<leader>b', group = 'Buffer' },
-      { '<leader>c', group = 'Code/LSP' },
+      { '<leader>c', group = 'Code/AI' },
       { '<leader>d', group = 'Diagnostics/Debug' },
       { '<leader>f', group = 'Find/File' },
-      { '<leader>g', group = 'Git' },
-      { '<leader>h', group = 'Help' },
+      { '<leader>g', group = 'Git/Diff' },
+      { '<leader>h', group = 'Hunk/Help' },
       { '<leader>i', group = 'Imports' },
       { '<leader>j', group = 'Jump' },
-      { '<leader>l', group = 'Lazy/LSP' },
-      { '<leader>m', group = 'Marks' },
-      { '<leader>p', group = 'Python' },
-      { '<leader>q', group = 'Quit/Macro' },
-      { '<leader>r', group = 'Registers/Replace/Run' },
+      { '<leader>l', group = 'Line/LazyGit' },
+      { '<leader>m', group = 'Markdown' },
+      { '<leader>o', group = 'Overseer' },
+      { '<leader>p', group = 'Project' },
+      { '<leader>q', group = 'Macro' },
+      { '<leader>r', group = 'Replace/Run' },
       { '<leader>s', group = 'Session/Search' },
-      { '<leader>t', group = 'Toggle/Test/Terminal' },
-      { '<leader>v', group = 'Split' },
-      { '<leader>w', group = 'Window' },
+      { '<leader>t', group = 'Toggle/Terminal' },
+      { '<leader>v', group = 'Visual/Terminal' },
+      { '<leader>w', group = 'Window/Split' },
       { '<leader>x', group = 'Diagnostics/Quickfix' },
     },
     win = {
@@ -56,13 +57,5 @@ return {
       { '<auto>', mode = 'nxso' },
     },
   },
-  keys = {
-    {
-      '<leader>?',
-      function()
-        require('which-key').show { global = false }
-      end,
-      desc = 'Buffer Local Keymaps (which-key)',
-    },
-  },
+  -- Keymaps are in lua/core/keymaps.lua (Section 8.14)
 }

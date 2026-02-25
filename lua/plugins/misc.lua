@@ -40,6 +40,47 @@ return {
         local readonly = vim.bo.readonly and ' [RO]' or ''
         local filetype = vim.bo.filetype ~= '' and ' [' .. vim.bo.filetype .. ']' or ''
 
+        -- Diagnostics count (native vim.diagnostic.count)
+        local diag = ''
+        local counts = vim.diagnostic.count(0)
+        local errors = counts[vim.diagnostic.severity.ERROR] or 0
+        local warns = counts[vim.diagnostic.severity.WARN] or 0
+        if errors > 0 or warns > 0 then
+          diag = string.format(' E:%d W:%d', errors, warns)
+        end
+
+        -- Git branch + diff stats (via gitsigns)
+        local branch = ''
+        local gitsigns_status = vim.b.gitsigns_status_dict
+        if gitsigns_status and gitsigns_status.head and gitsigns_status.head ~= '' then
+          local added = gitsigns_status.added or 0
+          local changed = gitsigns_status.changed or 0
+          local removed = gitsigns_status.removed or 0
+          local diff = ''
+          if added > 0 or changed > 0 or removed > 0 then
+            diff = string.format(' +%d ~%d -%d', added, changed, removed)
+          end
+          branch = ' ' .. gitsigns_status.head .. diff
+        end
+
+        -- Overseer task status
+        local task_status = ''
+        local ok, overseer = pcall(require, 'overseer')
+        if ok then
+          local tasks = overseer.list_tasks({ recent_first = true })
+          local running = vim.tbl_filter(function(task)
+            return task.status == overseer.STATUS.RUNNING
+          end, tasks)
+          local failed = vim.tbl_filter(function(task)
+            return task.status == overseer.STATUS.FAILURE
+          end, tasks)
+          if #running > 0 then
+            task_status = string.format(' R:%d', #running)
+          elseif #failed > 0 then
+            task_status = string.format(' F:%d', #failed)
+          end
+        end
+
         -- LSP status
         local lsp_status = ''
         local clients = vim.lsp.get_clients({ bufnr = 0 })
@@ -61,8 +102,8 @@ return {
         local progress = math.floor((line / total_lines) * 100)
 
         return string.format(
-          ' %s │ %s%s%s%s%s%s │ %d:%d │ %d%% ',
-          mode, filename, modified, readonly, filetype, lsp_status, venv, line, col, progress
+          ' %s │ %s%s%s%s%s%s%s%s%s │ %d:%d │ %d%% ',
+          mode, filename, modified, readonly, filetype, diag, branch, task_status, lsp_status, venv, line, col, progress
         )
       end
 
@@ -185,80 +226,11 @@ return {
       -- 4. NATIVE INDENT GUIDES (replaces mini.indentscope)
       -- ===================================================================
 
-      -- Use native listchars for indent visualization
-      vim.opt.list = true
-      vim.opt.listchars = {
-        tab = '│ ',
-        trail = '·',
-        extends = '›',
-        precedes = '‹',
-        nbsp = '␣',
-      }
-
-      -- Highlight current indent level with CursorColumn
-      vim.opt.cursorline = true
-      vim.opt.cursorcolumn = false
-
       -- Add subtle indent highlighting via match
       vim.fn.matchadd('Whitespace', [[\(^\s\+\)]], 10)
 
       -- ===================================================================
-      -- 5. NATIVE FUZZY FIND (replaces mini.pick)
-      -- ===================================================================
-
-      -- Note: Wildmenu settings are in core/options.lua
-
-      -- Path completion settings for fuzzy find
-      vim.opt.path = '.,**'
-      vim.opt.complete:append('kspell')
-
-      -- Native fuzzy file finder function
-      function _G.fuzzy_find_files()
-        local cwd = vim.fn.getcwd()
-        vim.ui.input({ prompt = 'Find file: ', completion = 'file' }, function(input)
-          if input then
-            vim.cmd('edit ' .. input)
-          end
-        end)
-      end
-
-      -- Native grep function
-      function _G.fuzzy_grep()
-        vim.ui.input({ prompt = 'Grep for: ' }, function(pattern)
-          if pattern and pattern ~= '' then
-            vim.cmd('vimgrep /' .. pattern .. '/gj **/*')
-            vim.cmd('copen')
-          end
-        end)
-      end
-
-      -- Native buffer finder (using vim.iter for modern Lua patterns)
-      function _G.fuzzy_buffers()
-        local buffers = vim.iter(vim.api.nvim_list_bufs())
-          :filter(function(buf)
-            return vim.fn.buflisted(buf) == 1
-          end)
-          :map(function(buf)
-            local name = vim.fn.bufname(buf)
-            name = name ~= '' and name or '[No Name]'
-            return buf .. ': ' .. name
-          end)
-          :totable()
-
-        vim.ui.select(buffers, {
-          prompt = 'Select buffer:',
-        }, function(choice)
-          if choice then
-            local buf_nr = tonumber(choice:match('^%d+'))
-            if buf_nr then
-              vim.cmd('buffer ' .. buf_nr)
-            end
-          end
-        end)
-      end
-
-      -- ===================================================================
-      -- 6. NATIVE ICONS (replaces mini.icons)
+      -- 5. NATIVE ICONS (replaces mini.icons)
       -- ===================================================================
 
       -- Use native filetype icons via signs

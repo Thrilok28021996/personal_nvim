@@ -1,5 +1,8 @@
 -- Core Neovim Options
 
+-- Prepend Mason bin to PATH early so LSP servers installed via Mason are found
+vim.env.PATH = vim.fn.stdpath 'data' .. '/mason/bin:' .. vim.env.PATH
+
 -- Line numbers
 vim.opt.number = true
 vim.opt.relativenumber = true
@@ -79,6 +82,10 @@ vim.opt.smartcase = true
 vim.opt.hlsearch = true
 vim.opt.incsearch = true
 
+-- Use ripgrep for :grep (respects .gitignore, fast)
+vim.opt.grepprg = 'rg --vimgrep --smart-case'
+vim.opt.grepformat = '%f:%l:%c:%m'
+
 -- Performance
 vim.opt.updatetime = 250
 vim.opt.timeoutlen = 300
@@ -90,7 +97,7 @@ vim.opt.splitbelow = true
 
 -- Display
 vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.listchars = { tab = '│ ', trail = '·', extends = '›', precedes = '‹', nbsp = '␣' }
 vim.opt.inccommand = 'split'
 vim.opt.wrap = false
 
@@ -158,6 +165,53 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
   callback = function()
     if vim.bo.buftype == '' and vim.fn.expand '%' ~= '' then
       vim.cmd 'silent! loadview'
+    end
+  end,
+})
+
+-- Auto-save all buffers on focus lost
+vim.api.nvim_create_autocmd('FocusLost', {
+  group = augroup,
+  callback = function()
+    vim.cmd 'silent! wa'
+  end,
+})
+
+-- Cursor word highlight (LSP document highlight + fallback)
+vim.api.nvim_create_autocmd('CursorHold', {
+  group = augroup,
+  callback = function()
+    local clients = vim.lsp.get_clients { bufnr = 0 }
+    local has_highlight = false
+    for _, client in ipairs(clients) do
+      if client.supports_method 'textDocument/documentHighlight' then
+        has_highlight = true
+        break
+      end
+    end
+    if has_highlight then
+      vim.lsp.buf.document_highlight()
+    elseif #clients == 0 then
+      vim.fn.matchadd('Search', '\\<' .. vim.fn.expand '<cword>' .. '\\>')
+    end
+  end,
+})
+
+vim.api.nvim_create_autocmd('CursorMoved', {
+  group = augroup,
+  callback = function()
+    local clients = vim.lsp.get_clients { bufnr = 0 }
+    local has_highlight = false
+    for _, client in ipairs(clients) do
+      if client.supports_method 'textDocument/documentHighlight' then
+        has_highlight = true
+        break
+      end
+    end
+    if has_highlight then
+      vim.lsp.buf.clear_references()
+    elseif #clients == 0 then
+      vim.fn.clearmatches()
     end
   end,
 })

@@ -3,9 +3,7 @@ return {
   {
     'folke/zen-mode.nvim',
     cmd = 'ZenMode',
-    keys = {
-      { '<leader>z', '<cmd>ZenMode<cr>', desc = 'Toggle Zen Mode' },
-    },
+    -- Keymaps are in lua/core/keymaps.lua (Section 6)
     config = function()
       require('zen-mode').setup {
         window = {

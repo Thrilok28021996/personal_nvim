@@ -9,13 +9,13 @@
 --   1. Leader & Basic Setup
 --   2. Editor Operations (save, select, search/replace, text manipulation)
 --   3. Navigation (buffers, windows, files, jumps, marks)
---   4. Code Features (folding, LSP integration via plugins, diagnostics)
+--   4. Code Features (folding, diagnostics, quickfix, spell, refactoring)
 --   5. Development Tools (testing, debugging, terminal, execution)
---   6. Visual & UI (toggles, themes, concealment)
---   7. Advanced Features (sessions, macros, registers, treesitter)
---   8. Plugin Integrations (which-key compatible groups)
+--   6. Visual & UI Toggles
+--   7. Sessions & Project Management
+--   8. Plugin Integrations (LSP, AI, git, formatting, etc.)
 --
--- Total: 160+ keymaps covering all IDE needs
+-- Total: 180+ keymaps covering all IDE needs
 -- ============================================================================
 
 -- ============================================================================
@@ -95,17 +95,11 @@ map('v', '<leader>rp', function()
   vim.cmd "'<,'>s///gc<Left><Left><Left><Left>"
 end, { desc = 'Replace in selection' })
 
--- Search word in project (uses quickfix)
-map('n', '<leader>*', function()
-  local word = vim.fn.expand '<cword>'
-  vim.cmd('vimgrep /' .. word .. '/gj **/*')
-  vim.cmd 'copen'
-end, { desc = 'Search word in project' })
+-- Search word in project (fzf-lua)
+map('n', '<leader>*', '<cmd>FzfLua grep_cword<cr>', { desc = 'Search word in project' })
 
--- Search in project (fuzzy)
-map('n', '<leader>/', function()
-  _G.fuzzy_grep()
-end, { desc = 'Search in project' })
+-- Search in current buffer (fzf-lua)
+map('n', '<leader>/', '<cmd>FzfLua grep_curbuf<cr>', { desc = 'Search in current buffer' })
 
 -- ---------------------------------------------------------------------------
 -- 2.5 Text Manipulation
@@ -126,15 +120,15 @@ map('v', '<', '<gv', { desc = 'Indent left' })
 map('v', '>', '>gv', { desc = 'Indent right' })
 
 -- Insert blank lines
-map('n', '<leader>o', 'o<Esc>', { desc = 'Insert line below' })
-map('n', '<leader>O', 'O<Esc>', { desc = 'Insert line above' })
+map('n', ']<Space>', 'o<Esc>', { desc = 'Insert line below' })
+map('n', '[<Space>', 'O<Esc>', { desc = 'Insert line above' })
 
 -- Join lines (keep cursor position)
 map('n', 'J', 'mzJ`z', { desc = 'Join lines (keep cursor)' })
 
 -- Increment/decrement numbers
 map('n', '+', '<C-a>', { desc = 'Increment number' })
-map('n', '-', '<C-x>', { desc = 'Decrement number' })
+-- Note: '-' is mapped to Oil (open parent directory) in Section 3.3
 
 -- ---------------------------------------------------------------------------
 -- 2.6 Comments & Documentation
@@ -224,7 +218,7 @@ map('n', '<C-Left>', '<cmd>vertical resize -2<CR>', { desc = 'Decrease window wi
 map('n', '<C-Right>', '<cmd>vertical resize +2<CR>', { desc = 'Increase window width' })
 
 -- Window splitting & management
-map('n', '<leader>v', '<C-w>v', { desc = 'Split vertical' })
+map('n', '<leader>wv', '<C-w>v', { desc = 'Split vertical' })
 map('n', '<leader>wh', '<C-w>s', { desc = 'Split horizontal' })
 map('n', '<leader>we', '<C-w>=', { desc = 'Equal window sizes' })
 map('n', '<leader>wc', '<cmd>close<CR>', { desc = 'Close current window' })
@@ -249,30 +243,11 @@ end, { desc = 'Toggle window zoom' })
 -- File explorer (Oil.nvim)
 map('n', '-', '<cmd>Oil<CR>', { desc = 'Open parent directory' })
 
--- Fuzzy file finding (native)
-map('n', '<leader>ff', function()
-  _G.fuzzy_find_files()
-end, { desc = 'Find files' })
-
-map('n', '<leader>fw', function()
-  _G.fuzzy_grep()
-end, { desc = 'Find word in files' })
-
-map('n', '<leader>fb', function()
-  _G.fuzzy_buffers()
-end, { desc = 'Find buffers' })
-
--- Recent files
-map('n', '<leader>fr', function()
-  local oldfiles = vim.v.oldfiles
-  vim.ui.select(oldfiles, {
-    prompt = 'Recent files:',
-  }, function(choice)
-    if choice then
-      vim.cmd('edit ' .. choice)
-    end
-  end)
-end, { desc = 'Find recent files' })
+-- Fuzzy file finding (fzf-lua)
+map('n', '<leader>ff', '<cmd>FzfLua files<cr>', { desc = 'Find files' })
+map('n', '<leader>fw', '<cmd>FzfLua live_grep<cr>', { desc = 'Find word in files' })
+map('n', '<leader>fb', '<cmd>FzfLua buffers<cr>', { desc = 'Find buffers' })
+map('n', '<leader>fr', '<cmd>FzfLua oldfiles<cr>', { desc = 'Find recent files' })
 
 -- ---------------------------------------------------------------------------
 -- 3.4 Jump List & Change List Navigation
@@ -291,12 +266,12 @@ map('n', 'g,', 'g,zz', { desc = 'Go to newer change' })
 -- ---------------------------------------------------------------------------
 
 -- Marks
-map('n', '<leader>m', '<cmd>marks<CR>', { desc = 'Show all marks' })
+map('n', "<leader>'", '<cmd>FzfLua marks<cr>', { desc = 'Browse marks' })
 map('n', '<leader>M', '<cmd>delmarks!<CR>', { desc = 'Delete all marks' })
 map('n', 'dm', '<cmd>delmarks ', { desc = 'Delete specific mark' })
 
 -- Registers
-map('n', '<leader>r', '<cmd>registers<CR>', { desc = 'Show all registers' })
+map('n', '<leader>"', '<cmd>FzfLua registers<cr>', { desc = 'Browse registers' })
 map('n', '<leader>R', function()
   vim.fn.setreg(vim.fn.input 'Register: ', '')
 end, { desc = 'Clear specific register' })
@@ -501,7 +476,7 @@ map('n', '<leader>zu', 'zuw', { desc = 'Undo dictionary change' })
 -- ---------------------------------------------------------------------------
 -- 4.5 LSP Code Actions & Refactoring (Native LSP)
 -- ---------------------------------------------------------------------------
--- Note: LSP keymaps are in lua/plugins/language.lua (LspAttach callback)
+-- Note: Core LSP keymaps are in Section 8.7 (LspAttach callback)
 -- This section handles code actions that work with LSP
 
 -- Extract to function (visual mode)
@@ -560,17 +535,7 @@ map('n', '<leader>ir', function()
   }
 end, { desc = 'Remove unused imports' })
 
--- Format selection (LSP range formatting)
-map('v', '<leader>cf', function()
-  local start_pos = vim.api.nvim_buf_get_mark(0, '<')
-  local end_pos = vim.api.nvim_buf_get_mark(0, '>')
-  vim.lsp.buf.format {
-    range = {
-      ['start'] = start_pos,
-      ['end'] = end_pos,
-    },
-  }
-end, { desc = 'Format selection (LSP)' })
+-- Note: Format buffer/selection is handled by Conform (Section 8.13)
 
 -- Extract variable (visual mode)
 map('v', '<leader>ev', function()
@@ -607,8 +572,8 @@ map('n', ']c', ']c', { desc = 'Next diff hunk' })
 map('n', '[c', '[c', { desc = 'Prev diff hunk' })
 map('n', 'do', 'do', { desc = 'Diff obtain (get from other)' })
 map('n', 'dp', 'dp', { desc = 'Diff put (send to other)' })
-map('n', '<leader>td', '<cmd>windo diffthis<CR>', { desc = 'Enable diff mode' })
-map('n', '<leader>tD', '<cmd>windo diffoff<CR>', { desc = 'Disable diff mode' })
+map('n', '<leader>gd', '<cmd>windo diffthis<CR>', { desc = 'Enable diff mode' })
+map('n', '<leader>gD', '<cmd>windo diffoff<CR>', { desc = 'Disable diff mode' })
 
 -- ---------------------------------------------------------------------------
 -- 4.8 URL Opening (Native vim.ui.open - 0.11+)
@@ -628,51 +593,7 @@ end, { desc = 'Open URL under cursor' })
 -- ============================================================================
 
 -- ---------------------------------------------------------------------------
--- 5.1 Testing (Neotest Integration)
--- ---------------------------------------------------------------------------
-
-map('n', '<leader>tr', function()
-  require('neotest').run.run()
-end, { desc = 'Test: Run nearest' })
-
-map('n', '<leader>tf', function()
-  require('neotest').run.run(vim.fn.expand '%')
-end, { desc = 'Test: Run file' })
-
-map('n', '<leader>ta', function()
-  require('neotest').run.run(vim.fn.getcwd())
-end, { desc = 'Test: Run all' })
-
-map('n', '<leader>ts', function()
-  require('neotest').summary.toggle()
-end, { desc = 'Test: Toggle summary' })
-
-map('n', '<leader>to', function()
-  require('neotest').output.open { enter = true }
-end, { desc = 'Test: View output' })
-
-map('n', '<leader>tp', function()
-  require('neotest').output_panel.toggle()
-end, { desc = 'Test: Toggle panel' })
-
-map('n', '<leader>tS', function()
-  require('neotest').run.stop()
-end, { desc = 'Test: Stop' })
-
-map('n', '<leader>td', function()
-  require('neotest').run.run { strategy = 'dap' }
-end, { desc = 'Test: Debug' })
-
-map('n', '[t', function()
-  require('neotest').jump.prev { status = 'failed' }
-end, { desc = 'Jump to prev failed test' })
-
-map('n', ']t', function()
-  require('neotest').jump.next { status = 'failed' }
-end, { desc = 'Jump to next failed test' })
-
--- ---------------------------------------------------------------------------
--- 5.2 Debugging (nvim-dap Integration)
+-- 5.1 Debugging (nvim-dap Integration)
 -- ---------------------------------------------------------------------------
 
 map('n', '<leader>db', function()
@@ -828,7 +749,7 @@ map('n', '<leader>fR', function()
 end, { desc = 'Rename current file' })
 
 -- Delete current file
-map('n', '<leader>fD', function()
+map('n', '<leader>fX', function()
   local file = vim.fn.expand '%'
   vim.ui.input({ prompt = 'Delete ' .. file .. '? (y/n): ' }, function(choice)
     if choice == 'y' or choice == 'Y' then
@@ -864,36 +785,27 @@ end, { desc = 'Make file executable' })
 -- 5.6 Language-Specific Operations
 -- ---------------------------------------------------------------------------
 
--- C/C++: Toggle between header and source file
+-- C/C++: Toggle between header and source file (using vim.fs.find)
 map('n', '<leader>ch', function()
   local ext = vim.fn.expand '%:e'
-  local base = vim.fn.expand '%:r'
-  local other
+  local name = vim.fn.expand '%:t:r'
+  local dir = vim.fn.expand '%:p:h'
+  local candidates
 
   if ext == 'cpp' or ext == 'cc' or ext == 'c' then
-    -- Source file: look for header
-    other = base .. '.h'
-    if vim.fn.filereadable(other) == 0 then
-      other = base .. '.hpp'
-    end
+    candidates = { name .. '.h', name .. '.hpp' }
   elseif ext == 'h' or ext == 'hpp' then
-    -- Header file: look for source
-    other = base .. '.cpp'
-    if vim.fn.filereadable(other) == 0 then
-      other = base .. '.cc'
-    end
-    if vim.fn.filereadable(other) == 0 then
-      other = base .. '.c'
-    end
+    candidates = { name .. '.cpp', name .. '.cc', name .. '.c' }
   else
     vim.notify('Not a C/C++ file', vim.log.levels.WARN)
     return
   end
 
-  if vim.fn.filereadable(other) == 1 then
-    vim.cmd('edit ' .. other)
+  local found = vim.fs.find(candidates, { path = dir, upward = true, limit = 1 })
+  if #found > 0 then
+    vim.cmd('edit ' .. found[1])
   else
-    vim.notify('Corresponding file not found: ' .. other, vim.log.levels.WARN)
+    vim.notify('Corresponding file not found', vim.log.levels.WARN)
   end
 end, { desc = 'C/C++: Toggle header/source' })
 
@@ -964,6 +876,9 @@ end, { desc = 'Toggle conceal' })
 
 -- Toggle format on save
 map('n', '<leader>xf', '<cmd>FormatToggle<CR>', { desc = 'Toggle format on save' })
+
+-- Toggle zen mode
+map('n', '<leader>tz', '<cmd>ZenMode<cr>', { desc = 'Toggle Zen Mode' })
 
 -- ============================================================================
 -- SECTION 7: SESSIONS & PROJECT MANAGEMENT
@@ -1116,14 +1031,14 @@ end, { desc = 'CD to project root' })
 -- 8.1 Plugin Manager (Lazy.nvim)
 -- ---------------------------------------------------------------------------
 
-map('n', '<leader>l', '<cmd>Lazy<CR>', { desc = 'Open Lazy plugin manager' })
+map('n', '<leader>L', '<cmd>Lazy<CR>', { desc = 'Open Lazy plugin manager' })
 
 -- ---------------------------------------------------------------------------
 -- 8.2 Code Symbols (Aerial.nvim)
 -- ---------------------------------------------------------------------------
 
-map('n', '<leader>a', '<cmd>AerialToggle!<CR>', { desc = 'Toggle code outline' })
-map('n', '<leader>A', '<cmd>AerialNavToggle<CR>', { desc = 'Toggle aerial navigation' })
+map('n', '<leader>cs', '<cmd>AerialToggle!<CR>', { desc = 'Toggle code outline' })
+map('n', '<leader>cS', '<cmd>AerialNavToggle<CR>', { desc = 'Toggle aerial navigation' })
 map('n', '[s', '<cmd>AerialPrev<CR>', { desc = 'Prev symbol' })
 map('n', ']s', '<cmd>AerialNext<CR>', { desc = 'Next symbol' })
 
@@ -1134,8 +1049,11 @@ map('n', ']s', '<cmd>AerialNext<CR>', { desc = 'Next symbol' })
 map('n', '<leader>ot', '<cmd>OverseerToggle<CR>', { desc = 'Task: Toggle' })
 map('n', '<leader>or', '<cmd>OverseerRun<CR>', { desc = 'Task: Run' })
 map('n', '<leader>oo', '<cmd>OverseerOpen<CR>', { desc = 'Task: Open' })
+map('n', '<leader>oc', '<cmd>OverseerClose<CR>', { desc = 'Task: Close' })
 map('n', '<leader>oq', '<cmd>OverseerQuickAction<CR>', { desc = 'Task: Quick action' })
+map('n', '<leader>oa', '<cmd>OverseerTaskAction<CR>', { desc = 'Task: Actions' })
 map('n', '<leader>ob', '<cmd>OverseerBuild<CR>', { desc = 'Task: Build' })
+map('n', '<leader>oi', '<cmd>OverseerInfo<CR>', { desc = 'Task: Info' })
 
 -- ---------------------------------------------------------------------------
 -- 8.4 Search & Replace (Spectre.nvim)
@@ -1163,6 +1081,7 @@ end, { desc = 'Search in current file' })
 
 map('n', '<leader>mp', '<cmd>PeekOpen<CR>', { desc = 'Markdown: Preview open' })
 map('n', '<leader>mc', '<cmd>PeekClose<CR>', { desc = 'Markdown: Preview close' })
+map('n', '<leader>mi', '<cmd>PasteImage<cr>', { desc = 'Markdown: Paste image' })
 
 -- Markdown-specific keymaps (buffer-local, activated on markdown files)
 vim.api.nvim_create_autocmd('FileType', {
@@ -1226,139 +1145,227 @@ map({ 'i', 's' }, '<S-Tab>', function()
   return '<S-Tab>'
 end, { expr = true, desc = 'Snippet: Prev or S-Tab' })
 
--- ============================================================================
--- SECTION 9: AUTO-FEATURES (Background Enhancements)
--- ============================================================================
-
--- Create augroup for better organization and performance
-local augroup = vim.api.nvim_create_augroup('UserConfigAutoFeatures', { clear = true })
-
 -- ---------------------------------------------------------------------------
--- 9.1 Unified Cursor Word Highlight (LSP + Fallback)
+-- 8.7 LSP Setup (Buffer-local keymaps & features via LspAttach)
 -- ---------------------------------------------------------------------------
--- Single autocmd that handles both LSP document highlight and non-LSP fallback
--- Optimized to avoid duplicate autocmds (saves ~2-5ms per trigger)
+-- Single LspAttach callback for all buffer-local LSP setup:
+-- keymaps, inlay hints, code lens auto-refresh, semantic tokens.
+-- Server configs and diagnostics are in lua/plugins/language.lua.
 
-vim.api.nvim_create_autocmd('CursorHold', {
-  group = augroup,
-  callback = function()
-    local clients = vim.lsp.get_clients { bufnr = 0 }
-
-    -- Check if any client supports document highlight
-    local has_document_highlight = false
-    for _, client in ipairs(clients) do
-      if client.supports_method 'textDocument/documentHighlight' then
-        has_document_highlight = true
-        break
-      end
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = vim.api.nvim_create_augroup('UserLspSetup', { clear = true }),
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    local buf = args.buf
+    if not client then
+      return
     end
 
-    if has_document_highlight then
-      -- Use LSP document highlight
-      vim.lsp.buf.document_highlight()
-    elseif #clients == 0 then
-      -- Fallback to matchadd for non-LSP buffers
-      vim.fn.matchadd('Search', '\\<' .. vim.fn.expand '<cword>' .. '\\>')
+    local opts = { buffer = buf, silent = true }
+
+    -- Navigation (fzf-lua pickers for multi-result LSP queries)
+    map('n', 'gd', function()
+      require('fzf-lua').lsp_definitions()
+    end, vim.tbl_extend('force', opts, { desc = 'Go to definition' }))
+    map('n', 'gD', vim.lsp.buf.declaration, vim.tbl_extend('force', opts, { desc = 'Go to declaration' }))
+    map('n', 'gy', function()
+      require('fzf-lua').lsp_typedefs()
+    end, vim.tbl_extend('force', opts, { desc = 'Go to type definition' }))
+    map('n', 'gO', function()
+      require('fzf-lua').lsp_document_symbols()
+    end, vim.tbl_extend('force', opts, { desc = 'Document symbols' }))
+    map('n', 'grr', function()
+      require('fzf-lua').lsp_references()
+    end, vim.tbl_extend('force', opts, { desc = 'Find references' }))
+    map('n', 'gri', function()
+      require('fzf-lua').lsp_implementations()
+    end, vim.tbl_extend('force', opts, { desc = 'Go to implementation' }))
+
+    -- Diagnostics
+    map('n', '<leader>dd', vim.diagnostic.open_float, vim.tbl_extend('force', opts, { desc = 'Show diagnostics float' }))
+    map('n', '<leader>ql', vim.diagnostic.setloclist, vim.tbl_extend('force', opts, { desc = 'Diagnostics to loclist' }))
+
+    -- Workspace & Call Hierarchy (fzf-lua pickers)
+    map('n', '<leader>ws', function()
+      require('fzf-lua').lsp_workspace_symbols()
+    end, vim.tbl_extend('force', opts, { desc = 'Workspace symbols' }))
+    map('n', '<leader>cI', function()
+      require('fzf-lua').lsp_incoming_calls()
+    end, vim.tbl_extend('force', opts, { desc = 'Incoming calls' }))
+    map('n', '<leader>co', function()
+      require('fzf-lua').lsp_outgoing_calls()
+    end, vim.tbl_extend('force', opts, { desc = 'Outgoing calls' }))
+
+    -- Signature help in insert mode
+    map('i', '<C-k>', vim.lsp.buf.signature_help, vim.tbl_extend('force', opts, { desc = 'Signature help' }))
+
+    -- Toggle inlay hints
+    map('n', '<leader>ih', function()
+      vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = buf }, { bufnr = buf })
+    end, vim.tbl_extend('force', opts, { desc = 'Toggle inlay hints' }))
+
+    -- Auto-enable inlay hints (if supported)
+    if client:supports_method 'textDocument/inlayHint' then
+      vim.lsp.inlay_hint.enable(true, { bufnr = buf })
+    end
+
+    -- Code Lens: keymaps + auto-refresh (if supported)
+    if client:supports_method 'textDocument/codeLens' then
+      map('n', '<leader>cl', vim.lsp.codelens.run, vim.tbl_extend('force', opts, { desc = 'Run code lens' }))
+      map('n', '<leader>cL', vim.lsp.codelens.refresh, vim.tbl_extend('force', opts, { desc = 'Refresh code lens' }))
+      vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
+        buffer = buf,
+        callback = function()
+          vim.lsp.codelens.refresh()
+        end,
+      })
+    end
+
+    -- Semantic Tokens (Neovim 0.11+)
+    if client:supports_method 'textDocument/semanticTokens' then
+      vim.lsp.semantic_tokens.start(buf, client.id)
     end
   end,
 })
 
-vim.api.nvim_create_autocmd('CursorMoved', {
-  group = augroup,
-  callback = function()
-    local clients = vim.lsp.get_clients { bufnr = 0 }
+-- ---------------------------------------------------------------------------
+-- 8.8 AI Assistant (CodeCompanion)
+-- ---------------------------------------------------------------------------
 
-    -- Check if any client supports document highlight
-    local has_document_highlight = false
-    for _, client in ipairs(clients) do
-      if client.supports_method 'textDocument/documentHighlight' then
-        has_document_highlight = true
-        break
-      end
-    end
+map({ 'n', 'v' }, '<leader>cc', '<cmd>CodeCompanionChat Toggle<cr>', { desc = 'AI: Toggle Chat' })
+map({ 'n', 'v' }, '<leader>ca', '<cmd>CodeCompanionActions<cr>', { desc = 'AI: Actions' })
+map({ 'n', 'v' }, '<leader>ci', '<cmd>CodeCompanion<cr>', { desc = 'AI: Inline Prompt' })
+map('v', '<leader>cx', '<cmd>CodeCompanionChat Add<cr>', { desc = 'AI: Add to Chat' })
 
-    if has_document_highlight then
-      -- Clear LSP references
-      vim.lsp.buf.clear_references()
-    elseif #clients == 0 then
-      -- Clear matchadd highlights
-      vim.fn.clearmatches()
-    end
-  end,
-})
+-- Command abbreviation: type :cc in command mode to expand to CodeCompanion
+vim.cmd [[cab cc CodeCompanion]]
 
 -- ---------------------------------------------------------------------------
--- 9.2 Auto-Save on Focus Lost
+-- 8.9 Git (LazyGit)
 -- ---------------------------------------------------------------------------
--- Automatically saves all buffers when switching to another application
--- Modern editor behavior - never lose work when multitasking
 
-vim.api.nvim_create_autocmd('FocusLost', {
-  group = augroup,
-  callback = function()
-    vim.cmd 'silent! wa'
-  end,
-})
+map('n', '<leader>lg', '<cmd>LazyGit<cr>', { desc = 'LazyGit' })
 
--- Note: Auto-save on buffer switch is handled by 'autowrite' option in options.lua
+-- ---------------------------------------------------------------------------
+-- 8.10 Undo History (Undotree)
+-- ---------------------------------------------------------------------------
+
+map('n', '<leader>u', '<cmd>UndotreeToggle<CR>', { desc = 'Toggle Undotree' })
+
+-- ---------------------------------------------------------------------------
+-- 8.11 Git Links (gitlinker.nvim)
+-- ---------------------------------------------------------------------------
+
+map({ 'n', 'v' }, '<leader>gy', '<cmd>GitLink<cr>', { desc = 'Yank git permalink' })
+map({ 'n', 'v' }, '<leader>gY', '<cmd>GitLink!<cr>', { desc = 'Open git permalink' })
+map({ 'n', 'v' }, '<leader>gb', '<cmd>GitLink blame<cr>', { desc = 'Yank git blame link' })
+map({ 'n', 'v' }, '<leader>gB', '<cmd>GitLink! blame<cr>', { desc = 'Open git blame' })
+
+-- ---------------------------------------------------------------------------
+-- 8.12 TODO Comments
+-- ---------------------------------------------------------------------------
+
+map('n', ']T', function()
+  require('todo-comments').jump_next()
+end, { desc = 'Next TODO' })
+map('n', '[T', function()
+  require('todo-comments').jump_prev()
+end, { desc = 'Prev TODO' })
+map('n', '<leader>ft', '<cmd>FzfLua grep { search = "TODO:|FIXME:|HACK:|WARN:|PERF:|NOTE:|TEST:" }<CR>', { desc = 'Find TODOs (fzf)' })
+
+-- ---------------------------------------------------------------------------
+-- 8.13 Autoformat (Conform)
+-- ---------------------------------------------------------------------------
+
+map({ 'n', 'v' }, '<leader>cf', function()
+  require('conform').format { async = true, lsp_fallback = true }
+end, { desc = 'Format buffer' })
+
+-- ---------------------------------------------------------------------------
+-- 8.14 Which-Key
+-- ---------------------------------------------------------------------------
+
+map('n', '<leader>?', function()
+  require('which-key').show { global = false }
+end, { desc = 'Buffer Local Keymaps (which-key)' })
+
+-- ---------------------------------------------------------------------------
+-- 8.15 Fuzzy Finder (fzf-lua)
+-- ---------------------------------------------------------------------------
+
+map('n', '<leader>fh', '<cmd>FzfLua helptags<cr>', { desc = 'Search help tags' })
+map('n', '<leader>fk', '<cmd>FzfLua keymaps<cr>', { desc = 'Search keymaps' })
+map('n', '<leader>fd', function()
+  require('fzf-lua').diagnostics_document()
+end, { desc = 'Search diagnostics (file)' })
+map('n', '<leader>fD', function()
+  require('fzf-lua').diagnostics_workspace()
+end, { desc = 'Search diagnostics (workspace)' })
+map('n', '<leader>fs', function()
+  require('fzf-lua').lsp_document_symbols()
+end, { desc = 'Search symbols (file)' })
+map('n', '<leader>fS', function()
+  require('fzf-lua').lsp_workspace_symbols()
+end, { desc = 'Search symbols (workspace)' })
+map('n', '<leader>fg', '<cmd>FzfLua git_status<cr>', { desc = 'Git changed files' })
+map('n', '<leader>f/', '<cmd>FzfLua search_history<cr>', { desc = 'Search history' })
+map('n', '<leader>fc', '<cmd>FzfLua command_history<cr>', { desc = 'Command history' })
+map('v', '<leader>*', '<cmd>FzfLua grep_visual<cr>', { desc = 'Grep visual selection' })
+
+-- ---------------------------------------------------------------------------
+-- 8.16 Gitsigns (buffer-local, set via on_attach)
+-- ---------------------------------------------------------------------------
+-- Called by gitsigns on_attach — keymaps only exist in git-tracked buffers.
+
+function _G.gitsigns_on_attach(bufnr)
+  local gs = require 'gitsigns'
+  local function bmap(mode, l, r, desc)
+    map(mode, l, r, { buffer = bufnr, desc = desc })
+  end
+
+  -- Navigation
+  bmap('n', ']h', gs.next_hunk, 'Next hunk')
+  bmap('n', '[h', gs.prev_hunk, 'Prev hunk')
+
+  -- Actions
+  bmap({ 'n', 'v' }, '<leader>hs', ':Gitsigns stage_hunk<CR>', 'Stage hunk')
+  bmap({ 'n', 'v' }, '<leader>hr', ':Gitsigns reset_hunk<CR>', 'Reset hunk')
+  bmap('n', '<leader>hS', gs.stage_buffer, 'Stage buffer')
+  bmap('n', '<leader>hu', gs.undo_stage_hunk, 'Undo stage hunk')
+  bmap('n', '<leader>hp', gs.preview_hunk, 'Preview hunk')
+  bmap('n', '<leader>hb', function() gs.blame_line { full = true } end, 'Blame line')
+  bmap('n', '<leader>hd', gs.diffthis, 'Diff this')
+  bmap('n', '<leader>hB', function() gs.toggle_current_line_blame() end, 'Toggle line blame')
+end
+
+-- ---------------------------------------------------------------------------
+-- 8.17 Linting (nvim-lint)
+-- ---------------------------------------------------------------------------
+
+map('n', '<leader>xL', function()
+  require('lint').try_lint()
+end, { desc = 'Lint current file' })
 
 -- ============================================================================
--- NATIVE NEOVIM 0.11+ DEFAULTS (No Keymaps Needed)
+-- END OF KEYMAPS
 -- ============================================================================
 --
--- These features are available by default in Neovim 0.11+ and don't require
--- custom keymaps. They're documented here for reference:
+-- All keymaps centralized here (single source of truth).
+-- Auto-features (cursor highlight, auto-save) are in lua/core/options.lua.
+-- Pre-defined macros are in lua/core/macros.lua.
+-- Which-key group labels are in lua/plugins/which-key.lua.
+-- LSP server configs and diagnostics are in lua/plugins/language.lua.
+-- Treesitter text objects are in lua/notemd/tree-sitter.lua.
+-- Plugin-internal keymaps (Oil, Aerial, Overseer, Spectre, DAP UI, mkdnflow
+-- buffers) stay in their respective plugin files.
+-- Gitsigns on_attach keymaps are defined here (Section 8.16) and referenced
+-- from lua/plugins/git-signs.lua.
+-- vim-visual-multi config (vim.g.VM_maps) is in lua/plugins/multicursor.lua.
 --
--- LSP (Native):
---   grn           → Rename symbol
---   grr           → Find references
---   gri           → Go to implementation
---   gra           → Code action
---   gO            → Document symbols
---   K             → Hover documentation
---   <C-S>         → Signature help
---
--- Diagnostics (Native):
---   [d            → Previous diagnostic
---   ]d            → Next diagnostic
---
--- Treesitter (Configured in tree-sitter.lua):
---   ]f / [f       → Next/prev function
---   ]c / [c       → Next/prev class (also used for diff hunks)
---   af / if       → Around/inside function
---   ac / ic       → Around/inside class
---   as / is       → Around/inside statement
---   ai / ii       → Around/inside conditional
---   al / il       → Around/inside loop
---   aa / ia       → Around/inside parameter
---   ab / ib       → Around/inside block
---   aC / iC       → Around/inside comment
---
--- Native Text Objects:
---   iw / aw       → Inside/around word
---   i" / a"       → Inside/around quotes
---   i( / a(       → Inside/around parentheses
---   i{ / a{       → Inside/around braces
---   it / at       → Inside/around tags
---   ip / ap       → Inside/around paragraph
---
--- Visual Block:
---   <C-v>         → Enter visual block mode
---   I / A         → Insert at column start/end
---   r             → Replace character
---
--- ============================================================================
--- END OF KEYMAPS CONFIGURATION
--- ============================================================================
---
--- Total Keymaps: 160+
--- Performance: <5ms overhead
--- Organization: 9 logical sections
--- Compatibility: Neovim 0.11+
--- Plugin Dependencies: Minimal (most are native)
---
--- For LSP-specific keymaps, see: lua/plugins/language.lua
--- For pre-defined macros, see: lua/core/macros.lua
--- For which-key group names, see: lua/plugins/which-key.lua
+-- Native Neovim 0.11+ defaults (no custom keymaps needed):
+--   grn  → Rename symbol       grr  → Find references
+--   gri  → Go to implementation gra  → Code action
+--   K    → Hover docs          <C-S> → Signature help
+--   [d / ]d → Prev/next diagnostic
 --
 -- ============================================================================

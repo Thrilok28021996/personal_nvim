@@ -35,6 +35,7 @@ return {
         'clangd', -- C/C++ Language server
         'clang-format', -- C/C++ formatter
         'codelldb', -- C/C++ debugger
+        'cmake-language-server', -- CMake LSP
 
         -- Lua tools
         'lua-language-server', -- Lua LSP for Neovim config

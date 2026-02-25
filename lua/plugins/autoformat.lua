@@ -2,16 +2,7 @@ return {
   'stevearc/conform.nvim',
   event = { 'BufWritePre' },
   cmd = { 'ConformInfo' },
-  keys = {
-    {
-      '<leader>cf',
-      function()
-        require('conform').format { async = true, lsp_fallback = true }
-      end,
-      mode = { 'n', 'v' },
-      desc = 'Format buffer',
-    },
-  },
+  -- Keymaps are in lua/core/keymaps.lua (Section 8.13)
   config = function()
     -- Initialize autoformat flag (default to enabled)
     vim.g.disable_autoformat = false

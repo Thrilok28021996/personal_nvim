@@ -1,12 +1,12 @@
 return {
   'nvim-treesitter/nvim-treesitter',
-  lazy = true,
+  event = { 'BufReadPost', 'BufNewFile' },
   build = ':TSUpdate',
   dependencies = {
     'nvim-treesitter/nvim-treesitter-textobjects',
   },
   opts = {
-    ensure_installed = { 'c', 'cpp', 'lua', 'vim', 'vimdoc', 'query', 'markdown', 'python' },
+    ensure_installed = { 'c', 'cpp', 'lua', 'vim', 'vimdoc', 'query', 'markdown', 'python', 'bash', 'json', 'yaml', 'toml', 'cmake', 'make' },
     auto_install = true,
     highlight = { enable = true },
     textobjects = {
@@ -18,6 +18,9 @@ return {
           [']a'] = '@parameter.inner',
           [']l'] = '@loop.outer',
           [']i'] = '@conditional.outer',
+          [']r'] = '@return.outer',
+          [']x'] = '@call.outer',
+          [']v'] = '@assignment.outer',
         },
         goto_next_end = {
           [']F'] = '@function.outer',
@@ -29,6 +32,9 @@ return {
           ['[a'] = '@parameter.inner',
           ['[l'] = '@loop.outer',
           ['[i'] = '@conditional.outer',
+          ['[r'] = '@return.outer',
+          ['[x'] = '@call.outer',
+          ['[v'] = '@assignment.outer',
         },
         goto_previous_end = {
           ['[F'] = '@function.outer',
@@ -63,6 +69,17 @@ return {
           -- Block
           ['ab'] = '@block.outer',
           ['ib'] = '@block.inner',
+          -- Return
+          ['ar'] = '@return.outer',
+          ['ir'] = '@return.inner',
+          -- Call (function call)
+          ['ax'] = '@call.outer',
+          ['ix'] = '@call.inner',
+          -- Assignment
+          ['a='] = '@assignment.outer',
+          ['i='] = '@assignment.inner',
+          ['l='] = '@assignment.lhs',
+          ['r='] = '@assignment.rhs',
         },
       },
       swap = {
@@ -77,6 +94,6 @@ return {
     },
   },
   config = function(_, opts)
-    require('nvim-treesitter.configs').setup(opts)
+    require('nvim-treesitter').setup(opts)
   end,
 }

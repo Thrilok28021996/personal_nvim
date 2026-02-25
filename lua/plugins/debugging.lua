@@ -1,5 +1,6 @@
 return {
   'mfussenegger/nvim-dap',
+  lazy = true,
   dependencies = {
     'rcarriga/nvim-dap-ui',
     'theHamsta/nvim-dap-virtual-text',
@@ -107,7 +108,7 @@ return {
     end
 
     -- Python debugging setup
-    require('dap-python').setup 'python'
+    require('dap-python').setup 'python3'
 
     -- Python configurations
     table.insert(dap.configurations.python, {

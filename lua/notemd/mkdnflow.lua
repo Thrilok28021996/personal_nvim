@@ -18,8 +18,7 @@ return {
         yaml = false,
       },
 
-      -- File paths
-      filetypes = { md = true, rmd = true, markdown = true },
+      -- filetypes: use new Neovim filetype names (no 'md' key needed)
       create_dirs = true,
       perspective = {
         priority = 'first',
@@ -44,13 +43,18 @@ return {
         end,
       },
 
-      -- To-do list
+      -- To-do list (updated API: use 'statuses' and 'status_propagation')
       to_do = {
         symbols = { ' ', '-', 'X' },
-        update_parents = true,
-        not_started = ' ',
-        in_progress = '-',
-        complete = 'X',
+        statuses = {
+          { name = 'not_started', marker = ' ' },
+          { name = 'in_progress', marker = '-' },
+          { name = 'complete',    marker = 'X' },
+        },
+        status_propagation = {
+          up = true,
+          down = false,
+        },
       },
 
       -- Tables
@@ -61,12 +65,16 @@ return {
         auto_extend_cols = false,
       },
 
-      -- Simplified keymaps (intuitive navigation)
+      -- Keymaps: avoid conflicts with global bindings
+      --   + → global: increment number  → use <leader>+ for heading
+      --   - → global: Oil               → use <leader>- for heading
+      --   o/O → native open-line        → use <M-o>/<M-O> for list items
+      --   i <Tab>/<S-Tab> → snippet nav → use <M-]>/<M-[> for table cells
       mappings = {
         MkdnEnter = { { 'n', 'v' }, '<CR>' },
         MkdnTab = false,
         MkdnSTab = false,
-        MkdnNextLink = false, -- Use Tab in buffer navigation instead
+        MkdnNextLink = false,
         MkdnPrevLink = false,
         MkdnNextHeading = { 'n', ']]' },
         MkdnPrevHeading = { 'n', '[[' },
@@ -74,22 +82,22 @@ return {
         MkdnGoForward = false,
         MkdnCreateLink = false,
         MkdnCreateLinkFromClipboard = false,
-        MkdnFollowLink = false, -- Using <CR>
+        MkdnFollowLink = false,
         MkdnDestroyLink = false,
         MkdnTagSpan = false,
         MkdnMoveSource = false,
         MkdnYankAnchorLink = false,
         MkdnYankFileAnchorLink = false,
-        MkdnIncreaseHeading = { 'n', '+' },
-        MkdnDecreaseHeading = { 'n', '-' },
+        MkdnIncreaseHeading = { 'n', '<leader>h+' }, -- was +, conflicted with increment
+        MkdnDecreaseHeading = { 'n', '<leader>h-' }, -- was -, conflicted with Oil
         MkdnToggleToDo = { { 'n', 'v' }, '<C-Space>' },
         MkdnNewListItem = false,
-        MkdnNewListItemBelowInsert = { 'n', 'o' },
-        MkdnNewListItemAboveInsert = { 'n', 'O' },
+        MkdnNewListItemBelowInsert = { 'n', '<M-o>' }, -- was o, conflicted with native open-line
+        MkdnNewListItemAboveInsert = { 'n', '<M-O>' }, -- was O, conflicted with native open-line
         MkdnExtendList = false,
         MkdnUpdateNumbering = false,
-        MkdnTableNextCell = { 'i', '<Tab>' },
-        MkdnTablePrevCell = { 'i', '<S-Tab>' },
+        MkdnTableNextCell = { 'i', '<M-]>' },   -- was <Tab>, conflicted with snippets
+        MkdnTablePrevCell = { 'i', '<M-[>' },   -- was <S-Tab>, conflicted with snippets
         MkdnTableNextRow = false,
         MkdnTablePrevRow = false,
         MkdnTableNewRowBelow = false,

@@ -2,6 +2,7 @@ return {
   {
     'ahmedkhalf/project.nvim',
     name = 'project_nvim',
+    event = 'VeryLazy',
     config = function()
       require('project_nvim').setup {
         -- Detection methods for project root

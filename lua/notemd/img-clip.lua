@@ -1,9 +1,7 @@
 return {
   'HakonHarnes/img-clip.nvim',
   event = 'VeryLazy',
+  cmd = 'PasteImage',
   opts = {},
-  keys = {
-    -- suggested keymap
-    { '<leader>p', '<cmd>PasteImage<cr>', desc = 'Paste image from system clipboard' },
-  },
+  -- Keymaps are in lua/core/keymaps.lua (Section 8.5)
 }

@@ -3,10 +3,10 @@ return {
   branch = 'master',
   event = 'VeryLazy',
   init = function()
+    vim.g.VM_theme = 'iceblue'
     vim.g.VM_maps = {
       ['Find Under'] = '<C-n>',
       ['Find Subword Under'] = '<C-n>',
     }
-    vim.g.VM_theme = 'iceblue'
   end,
 }

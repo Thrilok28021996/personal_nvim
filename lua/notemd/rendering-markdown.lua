@@ -1,12 +1,12 @@
 return {
   'MeanderingProgrammer/render-markdown.nvim',
   dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
-  ft = { 'markdown', 'Avante' },
+  ft = { 'markdown' },
   ---@module 'render-markdown'
   ---@type render.md.UserConfig
   config = function()
     require('render-markdown').setup {
-      file_types = { 'markdown', 'Avante' },
+      file_types = { 'markdown' },
       render_modes = { 'n', 'c' },
 
       -- Heading icons

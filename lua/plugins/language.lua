@@ -9,6 +9,7 @@
 vim.lsp.config.pyright = {
   cmd = { 'pyright-langserver', '--stdio' },
   filetypes = { 'python' },
+  root_markers = { 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', 'pyrightconfig.json', '.git' },
   settings = {
     python = {
       analysis = {
@@ -66,6 +67,13 @@ vim.lsp.config.lua_ls = {
   },
 }
 
+-- CMake LSP
+vim.lsp.config.cmake = {
+  cmd = { 'cmake-language-server' },
+  filetypes = { 'cmake' },
+  root_markers = { 'CMakeLists.txt', 'cmake', '.git' },
+}
+
 -- ============================================================================
 -- Native Diagnostics Configuration
 -- ============================================================================
@@ -95,96 +103,14 @@ vim.diagnostic.config {
 }
 
 -- ============================================================================
--- LspAttach Autocmd
+-- Enable LSP servers
 -- ============================================================================
-
--- Create augroup for LSP-related autocmds
-local lsp_augroup = vim.api.nvim_create_augroup('UserConfigLSP', { clear = true })
-
-vim.api.nvim_create_autocmd('LspAttach', {
-  group = lsp_augroup,
-  callback = function(args)
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-    local buf = args.buf
-
-    if not client then return end
-
-    -- Native Inlay Hints (Neovim 0.10+)
-    if client:supports_method('textDocument/inlayHint') then
-      vim.lsp.inlay_hint.enable(true, { bufnr = buf })
-    end
-
-    -- Custom keymaps (native defaults: grn, grr, gri, gra, gO, K, [d, ]d, <C-S>)
-    local opts = { buffer = buf, silent = true }
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, vim.tbl_extend('force', opts, { desc = 'Go to definition' }))
-    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, vim.tbl_extend('force', opts, { desc = 'Go to declaration' }))
-    vim.keymap.set('n', 'gy', vim.lsp.buf.type_definition, vim.tbl_extend('force', opts, { desc = 'Go to type definition' }))
-    vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, vim.tbl_extend('force', opts, { desc = 'Show diagnostics' }))
-    vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, vim.tbl_extend('force', opts, { desc = 'Diagnostics to loclist' }))
-
-    -- Workspace & Call Hierarchy
-    vim.keymap.set('n', '<leader>ws', vim.lsp.buf.workspace_symbol, vim.tbl_extend('force', opts, { desc = 'Workspace symbols' }))
-    vim.keymap.set('n', '<leader>ci', vim.lsp.buf.incoming_calls, vim.tbl_extend('force', opts, { desc = 'Incoming calls' }))
-    vim.keymap.set('n', '<leader>co', vim.lsp.buf.outgoing_calls, vim.tbl_extend('force', opts, { desc = 'Outgoing calls' }))
-
-    -- Document symbols (native 0.11 - gO)
-    vim.keymap.set('n', 'gO', vim.lsp.buf.document_symbol, vim.tbl_extend('force', opts, { desc = 'Document symbols' }))
-
-    -- Signature help in insert mode (native 0.11)
-    vim.keymap.set('i', '<C-k>', vim.lsp.buf.signature_help, vim.tbl_extend('force', opts, { desc = 'Signature help' }))
-
-    -- Toggle inlay hints
-    vim.keymap.set('n', '<leader>ih', function()
-      vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = buf }, { bufnr = buf })
-    end, vim.tbl_extend('force', opts, { desc = 'Toggle inlay hints' }))
-
-    -- LSP Code Lens (if supported)
-    if client:supports_method('textDocument/codeLens') then
-      vim.keymap.set('n', '<leader>cl', vim.lsp.codelens.run, vim.tbl_extend('force', opts, { desc = 'Run code lens' }))
-      vim.keymap.set('n', '<leader>cL', vim.lsp.codelens.refresh, vim.tbl_extend('force', opts, { desc = 'Refresh code lens' }))
-
-      -- Auto-refresh code lens on save
-      vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
-        buffer = buf,
-        callback = function()
-          vim.lsp.codelens.refresh()
-        end,
-      })
-    end
-
-    -- Note: Document highlight is handled by global CursorHold autocmd in keymaps.lua
-    -- This avoids duplicate autocmds and improves performance
-
-    -- Semantic Tokens (Neovim 0.11+)
-    -- Provides enhanced syntax highlighting beyond treesitter
-    -- Shows readonly, deprecated, async modifiers, etc.
-    if client:supports_method('textDocument/semanticTokens') then
-      vim.lsp.semantic_tokens.start(buf, client.id)
-    end
-  end,
-})
-
--- ============================================================================
--- Enable LSP servers per filetype
--- ============================================================================
-
-vim.api.nvim_create_autocmd('FileType', {
-  group = lsp_augroup,
-  pattern = 'python',
-  callback = function() vim.lsp.enable('pyright') end,
-})
-
-vim.api.nvim_create_autocmd('FileType', {
-  group = lsp_augroup,
-  pattern = { 'c', 'cpp', 'objc', 'objcpp', 'cuda' },
-  callback = function() vim.lsp.enable('clangd') end,
-})
-
-vim.api.nvim_create_autocmd('FileType', {
-  group = lsp_augroup,
-  pattern = 'lua',
-  callback = function() vim.lsp.enable('lua_ls') end,
-})
+-- LspAttach (keymaps, inlay hints, codelens, semantic tokens) is in
+-- lua/core/keymaps.lua Section 8.7
+--
+-- vim.lsp.enable must be called at the top level (not inside FileType autocmds)
+-- so the servers auto-start when matching filetypes are first opened.
+vim.lsp.enable({ 'pyright', 'clangd', 'lua_ls', 'cmake' })
 
 -- Return empty table (no plugin needed)
 return {}

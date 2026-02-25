@@ -18,6 +18,7 @@ require('lazy').setup {
   require 'plugins.comments',
   require 'plugins.fileexplorer',
   require 'plugins.misc',
+  require 'plugins.fzf-lua',
   require 'plugins.which-key',
   require 'plugins.mason',
 
@@ -30,7 +31,6 @@ require('lazy').setup {
   -- IDE Features
   require 'plugins.symbols',
   require 'plugins.debugging',
-  require 'plugins.testing',
   require 'plugins.tasks',
   require 'plugins.project',
   require 'plugins.search-replace',
@@ -38,7 +38,7 @@ require('lazy').setup {
   -- Git
   require 'plugins.git-signs',
   require 'plugins.lazygit',
-  require 'plugins.octo',
+  require 'plugins.gitlinker',
 
   -- AI
   require 'plugins.codecompanion',
