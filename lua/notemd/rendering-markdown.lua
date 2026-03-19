@@ -80,10 +80,7 @@ return {
       -- Disable latex support (not needed, removes warnings)
       latex = { enabled = false },
 
-      -- Enable blink.cmp completion integration
-      completions = {
-        blink = { enabled = true },
-      },
+      completions = { blink = { enabled = false } },
     }
   end,
 }

@@ -106,6 +106,20 @@ vim.g.loaded_perl_provider = 0
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
 
+-- Native project root auto-cd (replaces project.nvim)
+-- Uses vim.fs.root() (0.10+) to detect project root and cd into it
+local _root_patterns = { '.git', 'Makefile', 'package.json', 'setup.py', 'pyproject.toml', 'Cargo.toml', 'go.mod', 'CMakeLists.txt', 'compile_commands.json' }
+vim.api.nvim_create_autocmd('BufEnter', {
+  group = vim.api.nvim_create_augroup('ProjectRootCd', { clear = true }),
+  callback = function()
+    if vim.bo.buftype ~= '' or vim.fn.expand '%' == '' then return end
+    local root = vim.fs.root(0, _root_patterns)
+    if root and root ~= vim.uv.cwd() then
+      vim.uv.chdir(root)
+    end
+  end,
+})
+
 -- Create augroup for better organization
 local augroup = vim.api.nvim_create_augroup('UserConfigOptions', { clear = true })
 
@@ -217,6 +231,74 @@ vim.api.nvim_create_autocmd('CursorMoved', {
     elseif word_match_id then
       pcall(vim.fn.matchdelete, word_match_id)
       word_match_id = nil
+    end
+  end,
+})
+
+-- Native TODO highlights (replaces todo-comments.nvim)
+vim.api.nvim_create_autocmd('BufWinEnter', {
+  group = augroup,
+  callback = function()
+    for _, m in ipairs(vim.fn.getmatches()) do
+      if m.pattern and m.pattern:find('TODO', 1, true) then return end
+    end
+    vim.fn.matchadd('DiagnosticWarn', [[\v<(TODO|FIXME|HACK|WARN|BUG|XXX):]])
+    vim.fn.matchadd('DiagnosticInfo',  [[\v<(NOTE|INFO|PERF|OPTIMIZE):]])
+    vim.fn.matchadd('DiagnosticHint',  [[\v<(TEST|TESTING):]])
+  end,
+})
+
+-- Native Markdown TOC (replaces vim-markdown-toc)
+local function _md_anchor(title)
+  return title:lower():gsub('%s+', '-'):gsub('[^%w%-]', ''):gsub('%-%-+', '-')
+end
+
+local function _collect_headings()
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  local result, in_code = {}, false
+  for _, line in ipairs(lines) do
+    if line:match('^```') then in_code = not in_code end
+    if not in_code then
+      local level, title = line:match('^(#+)%s+(.+)')
+      if level and title then
+        table.insert(result, string.rep('  ', #level - 1) .. '- [' .. title .. '](#' .. _md_anchor(title) .. ')')
+      end
+    end
+  end
+  return result
+end
+
+vim.api.nvim_create_user_command('GenTocGFM', function()
+  local toc = { '<!-- TOC -->' }
+  vim.list_extend(toc, _collect_headings())
+  table.insert(toc, '<!-- /TOC -->')
+  vim.api.nvim_buf_set_lines(0, vim.fn.line('.') - 1, vim.fn.line('.') - 1, false, toc)
+end, { desc = 'Generate Markdown TOC' })
+
+vim.api.nvim_create_user_command('UpdateToc', function()
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  local s, e
+  for i, line in ipairs(lines) do
+    if line == '<!-- TOC -->' then s = i - 1
+    elseif line == '<!-- /TOC -->' then e = i end
+  end
+  if not s or not e then
+    vim.notify('No TOC found. Use :GenTocGFM first.', vim.log.levels.WARN)
+    return
+  end
+  local toc = { '<!-- TOC -->' }
+  vim.list_extend(toc, _collect_headings())
+  table.insert(toc, '<!-- /TOC -->')
+  vim.api.nvim_buf_set_lines(0, s, e, false, toc)
+end, { desc = 'Update Markdown TOC' })
+
+-- Auto-update TOC on markdown save
+vim.api.nvim_create_autocmd('BufWritePre', {
+  group = augroup,
+  pattern = '*.md',
+  callback = function()
+    for _, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, -1, false)) do
+      if line == '<!-- TOC -->' then vim.cmd 'UpdateToc' return end
     end
   end,
 })

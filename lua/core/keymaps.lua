@@ -980,48 +980,48 @@ vim.api.nvim_create_user_command('SessionAutoSave', function()
 end, { desc = 'Enable auto-save on exit' })
 
 -- ---------------------------------------------------------------------------
--- 7.2 Project Management (project_nvim Integration)
+-- 7.2 Project Management (Native vim.fs.root - 0.10+)
 -- ---------------------------------------------------------------------------
 
--- Find projects
-map('n', '<leader>fp', function()
-  local ok, project_nvim = pcall(require, 'project_nvim')
-  if not ok then
-    vim.notify('project_nvim not loaded', vim.log.levels.WARN)
-    return
-  end
-  local projects = project_nvim.get_recent_projects()
-  local items = {}
-  for _, project in ipairs(projects) do
-    table.insert(items, vim.fn.fnamemodify(project, ':t') .. ' (' .. project .. ')')
-  end
-  vim.ui.select(items, {
-    prompt = 'Projects:',
-  }, function(choice)
-    if choice then
-      local path = choice:match '%((.+)%)'
-      if path then
-        vim.cmd('cd ' .. path)
-        vim.notify('Switched to: ' .. path, vim.log.levels.INFO)
-      end
-    end
-  end)
-end, { desc = 'Find projects' })
+local _root_patterns = { '.git', 'Makefile', 'package.json', 'setup.py', 'pyproject.toml', 'Cargo.toml', 'go.mod', 'CMakeLists.txt', 'compile_commands.json' }
 
 -- Show project root
 map('n', '<leader>pr', function()
-  local root = require('project_nvim.project').get_project_root()
+  local root = vim.fs.root(0, _root_patterns)
   vim.notify(root and ('Project: ' .. root) or 'No project root', root and vim.log.levels.INFO or vim.log.levels.WARN)
 end, { desc = 'Show project root' })
 
 -- CD to project root
 map('n', '<leader>pc', function()
-  local root = require('project_nvim.project').get_project_root()
+  local root = vim.fs.root(0, _root_patterns)
   if root then
-    vim.cmd('cd ' .. root)
+    vim.uv.chdir(root)
     vim.notify('Changed to: ' .. root, vim.log.levels.INFO)
   end
 end, { desc = 'CD to project root' })
+
+-- Browse recent project roots (derived from oldfiles via vim.fs.root)
+map('n', '<leader>fp', function()
+  local seen, dirs = {}, {}
+  for _, file in ipairs(vim.v.oldfiles) do
+    local root = vim.fs.root(file, _root_patterns)
+    if root and not seen[root] and vim.uv.fs_stat(root) then
+      seen[root] = true
+      table.insert(dirs, root)
+    end
+    if #dirs >= 20 then break end
+  end
+  if #dirs == 0 then
+    vim.notify('No recent projects', vim.log.levels.WARN)
+    return
+  end
+  vim.ui.select(dirs, { prompt = 'Projects:' }, function(choice)
+    if choice then
+      vim.uv.chdir(choice)
+      vim.notify('Switched to: ' .. choice, vim.log.levels.INFO)
+    end
+  end)
+end, { desc = 'Find recent projects' })
 
 -- ============================================================================
 -- SECTION 8: PLUGIN-SPECIFIC INTEGRATIONS
@@ -1032,15 +1032,6 @@ end, { desc = 'CD to project root' })
 -- ---------------------------------------------------------------------------
 
 map('n', '<leader>L', '<cmd>Lazy<CR>', { desc = 'Open Lazy plugin manager' })
-
--- ---------------------------------------------------------------------------
--- 8.2 Code Symbols (Aerial.nvim)
--- ---------------------------------------------------------------------------
-
-map('n', '<leader>cs', '<cmd>AerialToggle!<CR>', { desc = 'Toggle code outline' })
-map('n', '<leader>cS', '<cmd>AerialNavToggle<CR>', { desc = 'Toggle aerial navigation' })
-map('n', '[s', '<cmd>AerialPrev<CR>', { desc = 'Prev symbol' })
-map('n', ']s', '<cmd>AerialNext<CR>', { desc = 'Next symbol' })
 
 -- ---------------------------------------------------------------------------
 -- 8.3 Task Runner (Overseer.nvim)
@@ -1054,26 +1045,6 @@ map('n', '<leader>oq', '<cmd>OverseerQuickAction<CR>', { desc = 'Task: Quick act
 map('n', '<leader>oa', '<cmd>OverseerTaskAction<CR>', { desc = 'Task: Actions' })
 map('n', '<leader>ob', '<cmd>OverseerBuild<CR>', { desc = 'Task: Build' })
 map('n', '<leader>oi', '<cmd>OverseerInfo<CR>', { desc = 'Task: Info' })
-
--- ---------------------------------------------------------------------------
--- 8.4 Search & Replace (Spectre.nvim)
--- ---------------------------------------------------------------------------
-
-map('n', '<leader>S', function()
-  require('spectre').toggle()
-end, { desc = 'Toggle Spectre' })
-
-map('n', '<leader>sw', function()
-  require('spectre').open_visual { select_word = true }
-end, { desc = 'Search word with Spectre' })
-
-map('v', '<leader>sw', function()
-  require('spectre').open_visual()
-end, { desc = 'Search selection' })
-
-map('n', '<leader>sp', function()
-  require('spectre').open_file_search { select_word = true }
-end, { desc = 'Search in current file' })
 
 -- ---------------------------------------------------------------------------
 -- 8.5 Markdown (Markdown Preview & Helpers)
@@ -1161,6 +1132,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
       return
     end
 
+    -- Native LSP completion (Neovim 0.11+ - replaces blink.cmp)
+    vim.lsp.completion.enable(true, client.id, buf, { autotrigger = true })
+
     local opts = { buffer = buf, silent = true }
 
     -- Navigation (fzf-lua pickers for multi-result LSP queries)
@@ -1244,33 +1218,64 @@ vim.cmd [[cab cc CodeCompanion]]
 -- 8.9 Git (LazyGit)
 -- ---------------------------------------------------------------------------
 
-map('n', '<leader>lg', '<cmd>LazyGit<cr>', { desc = 'LazyGit' })
+map('n', '<leader>lg', function()
+  local buf = vim.api.nvim_create_buf(false, true)
+  local w = math.floor(vim.o.columns * 0.92)
+  local h = math.floor(vim.o.lines * 0.88)
+  local win = vim.api.nvim_open_win(buf, true, {
+    relative = 'editor', style = 'minimal', border = 'rounded',
+    width = w, height = h,
+    row = math.floor((vim.o.lines - h) / 2),
+    col = math.floor((vim.o.columns - w) / 2),
+  })
+  vim.fn.termopen('lazygit', {
+    on_exit = function()
+      if vim.api.nvim_win_is_valid(win) then vim.api.nvim_win_close(win, true) end
+    end,
+  })
+  vim.cmd 'startinsert'
+end, { desc = 'LazyGit' })
 
 -- ---------------------------------------------------------------------------
--- 8.10 Undo History (Undotree)
+-- 8.11 Git Links (Native - replaces gitlinker.nvim)
 -- ---------------------------------------------------------------------------
 
-map('n', '<leader>u', '<cmd>UndotreeToggle<CR>', { desc = 'Toggle Undotree' })
+local function git_permalink(open, blame)
+  local cwd = vim.fn.expand '%:p:h'
+  local root = vim.fn.system('git -C ' .. vim.fn.shellescape(cwd) .. ' rev-parse --show-toplevel'):gsub('%s+$', '')
+  if vim.v.shell_error ~= 0 then
+    vim.notify('Not in a git repo', vim.log.levels.WARN)
+    return
+  end
+  local commit = vim.fn.system('git -C ' .. vim.fn.shellescape(root) .. ' rev-parse HEAD'):gsub('%s+$', '')
+  local remote = vim.fn.system('git -C ' .. vim.fn.shellescape(root) .. ' remote get-url origin'):gsub('%s+$', '')
+  remote = remote:gsub('git@([^:]+):', 'https://%1/')
+  remote = remote:gsub('%.git$', '')
+  local rel = vim.fn.expand('%:p'):sub(#root + 2)
+  local line1, line2 = vim.fn.line 'v', vim.fn.line '.'
+  if line1 > line2 then line1, line2 = line2, line1 end
+  local line_ref = line1 == line2 and ('#L' .. line1) or ('#L' .. line1 .. '-L' .. line2)
+  local url = remote .. (blame and '/blame/' or '/blob/') .. commit .. '/' .. rel .. line_ref
+  if open then
+    vim.ui.open(url)
+  else
+    vim.fn.setreg('+', url)
+    vim.notify('Copied: ' .. url, vim.log.levels.INFO)
+  end
+end
+
+map({ 'n', 'v' }, '<leader>gy', function() git_permalink(false, false) end, { desc = 'Yank git permalink' })
+map({ 'n', 'v' }, '<leader>gY', function() git_permalink(true, false) end, { desc = 'Open git permalink' })
+map({ 'n', 'v' }, '<leader>gb', function() git_permalink(false, true) end, { desc = 'Yank git blame link' })
+map({ 'n', 'v' }, '<leader>gB', function() git_permalink(true, true) end, { desc = 'Open git blame' })
 
 -- ---------------------------------------------------------------------------
--- 8.11 Git Links (gitlinker.nvim)
+-- 8.12 TODO Comments (Native - replaces todo-comments.nvim)
 -- ---------------------------------------------------------------------------
 
-map({ 'n', 'v' }, '<leader>gy', '<cmd>GitLink<cr>', { desc = 'Yank git permalink' })
-map({ 'n', 'v' }, '<leader>gY', '<cmd>GitLink!<cr>', { desc = 'Open git permalink' })
-map({ 'n', 'v' }, '<leader>gb', '<cmd>GitLink blame<cr>', { desc = 'Yank git blame link' })
-map({ 'n', 'v' }, '<leader>gB', '<cmd>GitLink! blame<cr>', { desc = 'Open git blame' })
-
--- ---------------------------------------------------------------------------
--- 8.12 TODO Comments
--- ---------------------------------------------------------------------------
-
-map('n', ']T', function()
-  require('todo-comments').jump_next()
-end, { desc = 'Next TODO' })
-map('n', '[T', function()
-  require('todo-comments').jump_prev()
-end, { desc = 'Prev TODO' })
+local _todo_pat = [[\v<(TODO|FIXME|HACK|WARN|BUG|NOTE|PERF|TEST):]]
+map('n', ']T', function() vim.fn.search(_todo_pat, 'W') end, { desc = 'Next TODO' })
+map('n', '[T', function() vim.fn.search(_todo_pat, 'Wb') end, { desc = 'Prev TODO' })
 map('n', '<leader>ft', '<cmd>FzfLua grep { search = "TODO:|FIXME:|HACK:|WARN:|PERF:|NOTE:|TEST:" }<CR>', { desc = 'Find TODOs (fzf)' })
 
 -- ---------------------------------------------------------------------------
@@ -1280,14 +1285,6 @@ map('n', '<leader>ft', '<cmd>FzfLua grep { search = "TODO:|FIXME:|HACK:|WARN:|PE
 map({ 'n', 'v' }, '<leader>cf', function()
   require('conform').format { async = true, lsp_fallback = true }
 end, { desc = 'Format buffer' })
-
--- ---------------------------------------------------------------------------
--- 8.14 Which-Key
--- ---------------------------------------------------------------------------
-
-map('n', '<leader>?', function()
-  require('which-key').show { global = false }
-end, { desc = 'Buffer Local Keymaps (which-key)' })
 
 -- ---------------------------------------------------------------------------
 -- 8.15 Fuzzy Finder (fzf-lua)
@@ -1351,12 +1348,11 @@ end, { desc = 'Lint current file' })
 -- ============================================================================
 --
 -- All keymaps centralized here (single source of truth).
--- Auto-features (cursor highlight, auto-save) are in lua/core/options.lua.
+-- Auto-features (cursor highlight, auto-save, project root) are in lua/core/options.lua.
 -- Pre-defined macros are in lua/core/macros.lua.
--- Which-key group labels are in lua/plugins/which-key.lua.
 -- LSP server configs and diagnostics are in lua/plugins/language.lua.
 -- Treesitter text objects are in lua/notemd/tree-sitter.lua.
--- Plugin-internal keymaps (Oil, Aerial, Overseer, Spectre, DAP UI, mkdnflow
+-- Plugin-internal keymaps (Oil, Overseer, DAP UI, mkdnflow
 -- buffers) stay in their respective plugin files.
 -- Gitsigns on_attach keymaps are defined here (Section 8.16) and referenced
 -- from lua/plugins/git-signs.lua.

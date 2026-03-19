@@ -1,17 +1,5 @@
 -- Native alternatives to mini.nvim modules
--- All functionality implemented using native Neovim features
-
-return {
-  -- No plugins needed - using native Neovim features configured in init.lua
-  -- This file exists for consistency but loads native configs via autocmd
-
-  {
-    'native-features',
-    name = 'native-mini-alternatives',
-    dir = vim.fn.stdpath('config'),
-    lazy = false,
-    priority = 1000,
-    config = function()
+-- Required directly from init.lua (no lazy.nvim involvement)
       -- ===================================================================
       -- 1. NATIVE STATUSLINE (replaces mini.statusline)
       -- ===================================================================
@@ -262,7 +250,4 @@ return {
         })
       end
 
-      -- Native alternatives loaded silently for clean startup
-    end,
-  },
-}
+-- Native alternatives loaded silently for clean startup

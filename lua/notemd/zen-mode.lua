@@ -27,7 +27,7 @@ return {
             showcmd = false,
             laststatus = 0,
           },
-          twilight = { enabled = true },
+          twilight = { enabled = false },
           gitsigns = { enabled = false },
           tmux = { enabled = false },
           kitty = {
@@ -35,31 +35,6 @@ return {
             font = '+4',
           },
         },
-      }
-    end,
-  },
-
-  -- Twilight for better focus
-  {
-    'folke/twilight.nvim',
-    cmd = { 'Twilight', 'TwilightEnable', 'TwilightDisable' },
-    config = function()
-      require('twilight').setup {
-        dimming = {
-          alpha = 0.25,
-          color = { 'Normal', '#ffffff' },
-          term_bg = '#000000',
-          inactive = false,
-        },
-        context = 10,
-        treesitter = true,
-        expand = {
-          'function',
-          'method',
-          'table',
-          'if_statement',
-        },
-        exclude = {},
       }
     end,
   },
