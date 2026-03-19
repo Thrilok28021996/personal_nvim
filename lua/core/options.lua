@@ -89,7 +89,6 @@ vim.opt.grepformat = '%f:%l:%c:%m'
 -- Performance
 vim.opt.updatetime = 250
 vim.opt.timeoutlen = 300
-vim.opt.lazyredraw = true -- Improves performance during macros/commands
 
 -- Splits
 vim.opt.splitright = true
@@ -178,6 +177,8 @@ vim.api.nvim_create_autocmd('FocusLost', {
 })
 
 -- Cursor word highlight (LSP document highlight + fallback)
+local word_match_id = nil
+
 vim.api.nvim_create_autocmd('CursorHold', {
   group = augroup,
   callback = function()
@@ -192,7 +193,10 @@ vim.api.nvim_create_autocmd('CursorHold', {
     if has_highlight then
       vim.lsp.buf.document_highlight()
     elseif #clients == 0 then
-      vim.fn.matchadd('Search', '\\<' .. vim.fn.expand '<cword>' .. '\\>')
+      if word_match_id then
+        pcall(vim.fn.matchdelete, word_match_id)
+      end
+      word_match_id = vim.fn.matchadd('Search', '\\<' .. vim.fn.expand '<cword>' .. '\\>')
     end
   end,
 })
@@ -210,8 +214,9 @@ vim.api.nvim_create_autocmd('CursorMoved', {
     end
     if has_highlight then
       vim.lsp.buf.clear_references()
-    elseif #clients == 0 then
-      vim.fn.clearmatches()
+    elseif word_match_id then
+      pcall(vim.fn.matchdelete, word_match_id)
+      word_match_id = nil
     end
   end,
 })

@@ -16,6 +16,16 @@ return {
       -- 1. NATIVE STATUSLINE (replaces mini.statusline)
       -- ===================================================================
 
+      -- Cache overseer module to avoid repeated requires on every render
+      local _overseer = nil
+      local function get_overseer()
+        if _overseer == nil then
+          local ok, m = pcall(require, 'overseer')
+          _overseer = ok and m or false
+        end
+        return _overseer
+      end
+
       -- Statusline function with LSP, git, and file info
       function _G.statusline()
         local mode_map = {
@@ -65,8 +75,8 @@ return {
 
         -- Overseer task status
         local task_status = ''
-        local ok, overseer = pcall(require, 'overseer')
-        if ok then
+        local overseer = get_overseer()
+        if overseer then
           local tasks = overseer.list_tasks({ recent_first = true })
           local running = vim.tbl_filter(function(task)
             return task.status == overseer.STATUS.RUNNING

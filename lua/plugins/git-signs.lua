@@ -19,6 +19,10 @@ return {
       changedelete = { text = '~' },
     },
     -- Keymaps defined in lua/core/keymaps.lua (Section 8.16)
-    on_attach = _G.gitsigns_on_attach,
+    on_attach = function(bufnr)
+      if _G.gitsigns_on_attach then
+        _G.gitsigns_on_attach(bufnr)
+      end
+    end,
   },
 }

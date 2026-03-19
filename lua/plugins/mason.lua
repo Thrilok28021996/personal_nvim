@@ -27,7 +27,6 @@ return {
         'stylua', -- lua formatter
         'isort', -- python formatter
         'black', -- python formatter
-        'pylint', -- python linter
         'ruff', -- python formatter & linter
         'pyright', -- Python Language server
 

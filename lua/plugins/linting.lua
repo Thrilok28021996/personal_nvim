@@ -8,8 +8,9 @@ return {
       c = { 'clangtidy' },
       cpp = { 'clangtidy' },
     }
-    -- Lint only on save (not too aggressive)
-    vim.api.nvim_create_autocmd('BufWritePost', {
+    vim.api.nvim_create_augroup('nvim_lint', { clear = true })
+    vim.api.nvim_create_autocmd({ 'BufWritePost', 'BufEnter', 'InsertLeave' }, {
+      group = 'nvim_lint',
       callback = function()
         lint.try_lint()
       end,
