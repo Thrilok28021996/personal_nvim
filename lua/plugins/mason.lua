@@ -1,50 +1,24 @@
+-- Mason: tool installer UI — loaded only when :Mason is called
+-- On a fresh machine, run :Mason and install the tools below,
+-- or install via homebrew:
+--
+--   brew install lua-language-server pyright stylua black isort ruff prettier
+--   # ruff >= 0.5.3 required — runs as LSP server (ruff server) replacing nvim-lint
+--   brew install llvm          # provides clangd + clang-format
+--   brew install cmake         # + pip install cmake-language-server
+--   brew install codelldb      # C/C++ debugger
+--   brew install bash-language-server  # optional
+--
 return {
   'williamboman/mason.nvim',
-  dependencies = {
-    'WhoIsSethDaniel/mason-tool-installer.nvim',
+  cmd = 'Mason',
+  opts = {
+    ui = {
+      icons = {
+        package_installed   = '✓',
+        package_pending     = '➜',
+        package_uninstalled = '✗',
+      },
+    },
   },
-  event = 'VimEnter', -- Load on startup instead of VeryLazy
-  priority = 100, -- Load early
-  config = function()
-    local mason = require 'mason'
-
-    local mason_tool_installer = require 'mason-tool-installer'
-
-    -- enable mason and configure icons
-    mason.setup {
-      ui = {
-        icons = {
-          package_installed = '✓',
-          package_pending = '➜',
-          package_uninstalled = '✗',
-        },
-      },
-    }
-
-    mason_tool_installer.setup {
-      ensure_installed = {
-        'prettier', -- prettier formatter
-        'stylua', -- lua formatter
-        'isort', -- python formatter
-        'black', -- python formatter
-        'ruff', -- python formatter & linter
-        'pyright', -- Python Language server
-
-        -- C/C++ tools
-        'clangd', -- C/C++ Language server
-        'clang-format', -- C/C++ formatter
-        'codelldb', -- C/C++ debugger
-        'cmake-language-server', -- CMake LSP
-
-        -- Lua tools
-        'lua-language-server', -- Lua LSP for Neovim config
-      },
-
-      -- Automatically install tools on startup
-      auto_update = false,
-      run_on_start = true,
-      start_delay = 3000, -- 3 second delay after start
-      debounce_hours = 5, -- at least 5 hours between attempts
-    }
-  end,
 }

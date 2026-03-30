@@ -74,6 +74,24 @@ vim.lsp.config.cmake = {
   root_markers = { 'CMakeLists.txt', 'cmake', '.git' },
 }
 
+-- Ruff LSP (Python linting + import sorting, replaces nvim-lint ruff)
+-- Runs alongside pyright: pyright handles types, ruff handles style/linting
+-- Requires: ruff >= 0.5.3 (brew install ruff)
+vim.lsp.config.ruff = {
+  cmd = { 'ruff', 'server' },
+  filetypes = { 'python' },
+  root_markers = { 'pyproject.toml', 'ruff.toml', '.ruff.toml', '.git' },
+  -- Disable capabilities ruff doesn't support, defer to pyright
+  capabilities = {
+    hoverProvider = false,
+  },
+  init_options = {
+    settings = {
+      showSyntaxErrors = true,
+    },
+  },
+}
+
 -- ============================================================================
 -- Native Diagnostics Configuration
 -- ============================================================================
@@ -110,7 +128,7 @@ vim.diagnostic.config {
 --
 -- vim.lsp.enable must be called at the top level (not inside FileType autocmds)
 -- so the servers auto-start when matching filetypes are first opened.
-vim.lsp.enable({ 'pyright', 'clangd', 'lua_ls', 'cmake' })
+vim.lsp.enable({ 'pyright', 'clangd', 'lua_ls', 'cmake', 'ruff' })
 
 -- Return empty table (no plugin needed)
 return {}

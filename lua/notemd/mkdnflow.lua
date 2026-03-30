@@ -43,14 +43,14 @@ return {
         end,
       },
 
-      -- To-do list (updated API: use 'statuses' and 'status_propagation')
+      -- To-do list (new dict API with status_order sibling)
       to_do = {
-        symbols = { ' ', '-', 'X' },
         statuses = {
-          { name = 'not_started', marker = ' ' },
-          { name = 'in_progress', marker = '-' },
-          { name = 'complete',    marker = 'X' },
+          not_started = { marker = ' ' },
+          in_progress = { marker = '-' },
+          complete    = { marker = 'X' },
         },
+        status_order = { 'not_started', 'in_progress', 'complete' },
         status_propagation = {
           up = true,
           down = false,

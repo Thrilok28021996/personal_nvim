@@ -23,11 +23,9 @@ require('lazy').setup {
 
   -- LSP & Completion
   require 'plugins.autoformat',
-  require 'plugins.linting',
 
   -- IDE Features
   require 'plugins.debugging',
-  require 'plugins.tasks',
 
   -- Git
   require 'plugins.git-signs',
@@ -37,11 +35,8 @@ require('lazy').setup {
 
   -- Markdown
   require 'notemd.tree-sitter',
-  require 'notemd.markdown-preview',
-  require 'notemd.img-clip',
   require 'notemd.rendering-markdown',
   require 'notemd.mkdnflow',
-  require 'notemd.zen-mode',
 
   -- Extra
   require 'plugins.multicursor',

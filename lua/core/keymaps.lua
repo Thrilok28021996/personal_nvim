@@ -134,7 +134,7 @@ map('n', '+', '<C-a>', { desc = 'Increment number' })
 -- 2.6 Comments & Documentation
 -- ---------------------------------------------------------------------------
 
--- Comment toggle (requires comment plugin)
+-- Comment toggle (native Neovim 0.10+ operator — no plugin needed)
 map('n', '<C-/>', 'gcc', { remap = true, desc = 'Toggle comment' })
 map('v', '<C-/>', 'gc', { remap = true, desc = 'Toggle comment' })
 
@@ -418,36 +418,21 @@ map('n', '[Q', '<cmd>cfirst<CR>zz', { desc = 'First quickfix item' })
 map('n', ']l', '<cmd>lnext<CR>zz', { desc = 'Next loclist item' })
 map('n', '[l', '<cmd>lprev<CR>zz', { desc = 'Prev loclist item' })
 
--- Toggle quickfix list
+-- Toggle quickfix / location list
+local function toggle_list(key, open_cmd, close_cmd)
+  for _, win in pairs(vim.fn.getwininfo()) do
+    if win[key] == 1 then
+      vim.cmd(close_cmd)
+      return
+    end
+  end
+  vim.cmd(open_cmd)
+end
 map('n', '<leader>xq', function()
-  local qf_exists = false
-  for _, win in pairs(vim.fn.getwininfo()) do
-    if win['quickfix'] == 1 then
-      qf_exists = true
-      break
-    end
-  end
-  if qf_exists then
-    vim.cmd 'cclose'
-  else
-    vim.cmd 'copen'
-  end
+  toggle_list('quickfix', 'copen', 'cclose')
 end, { desc = 'Toggle quickfix list' })
-
--- Toggle location list
 map('n', '<leader>xl', function()
-  local loc_exists = false
-  for _, win in pairs(vim.fn.getwininfo()) do
-    if win['loclist'] == 1 then
-      loc_exists = true
-      break
-    end
-  end
-  if loc_exists then
-    vim.cmd 'lclose'
-  else
-    vim.cmd 'lopen'
-  end
+  toggle_list('loclist', 'lopen', 'lclose')
 end, { desc = 'Toggle location list' })
 
 -- ---------------------------------------------------------------------------
@@ -877,8 +862,44 @@ end, { desc = 'Toggle conceal' })
 -- Toggle format on save
 map('n', '<leader>xf', '<cmd>FormatToggle<CR>', { desc = 'Toggle format on save' })
 
--- Toggle zen mode
-map('n', '<leader>tz', '<cmd>ZenMode<cr>', { desc = 'Toggle Zen Mode' })
+-- Toggle zen mode (native - replaces zen-mode.nvim)
+local _zen = { active = false }
+map('n', '<leader>tz', function()
+  if _zen.active then
+    vim.wo.number = _zen.number
+    vim.wo.relativenumber = _zen.relnumber
+    vim.wo.signcolumn = _zen.signcolumn
+    vim.wo.foldcolumn = _zen.foldcolumn
+    vim.wo.cursorline = _zen.cursorline
+    vim.wo.list = _zen.list
+    vim.o.laststatus = _zen.laststatus
+    vim.o.showtabline = _zen.showtabline
+    vim.cmd 'wincmd ='
+    _zen.active = false
+  else
+    _zen = {
+      active = true,
+      number = vim.wo.number,
+      relnumber = vim.wo.relativenumber,
+      signcolumn = vim.wo.signcolumn,
+      foldcolumn = vim.wo.foldcolumn,
+      cursorline = vim.wo.cursorline,
+      list = vim.wo.list,
+      laststatus = vim.o.laststatus,
+      showtabline = vim.o.showtabline,
+    }
+    vim.wo.number = false
+    vim.wo.relativenumber = false
+    vim.wo.signcolumn = 'no'
+    vim.wo.foldcolumn = '0'
+    vim.wo.cursorline = false
+    vim.wo.list = false
+    vim.o.laststatus = 0
+    vim.o.showtabline = 0
+    vim.cmd 'wincmd |'
+    vim.cmd 'wincmd _'
+  end
+end, { desc = 'Toggle Zen Mode' })
 
 -- ============================================================================
 -- SECTION 7: SESSIONS & PROJECT MANAGEMENT
@@ -969,6 +990,7 @@ end, { desc = 'Load session from list' })
 -- Auto-save session on exit (user command)
 vim.api.nvim_create_user_command('SessionAutoSave', function()
   vim.api.nvim_create_autocmd('VimLeavePre', {
+    group = vim.api.nvim_create_augroup('AutoSessionSave', { clear = true }),
     callback = function()
       local session_dir = vim.fn.stdpath 'data' .. '/sessions'
       vim.fn.mkdir(session_dir, 'p')
@@ -1009,7 +1031,9 @@ map('n', '<leader>fp', function()
       seen[root] = true
       table.insert(dirs, root)
     end
-    if #dirs >= 20 then break end
+    if #dirs >= 20 then
+      break
+    end
   end
   if #dirs == 0 then
     vim.notify('No recent projects', vim.log.levels.WARN)
@@ -1034,24 +1058,39 @@ end, { desc = 'Find recent projects' })
 map('n', '<leader>L', '<cmd>Lazy<CR>', { desc = 'Open Lazy plugin manager' })
 
 -- ---------------------------------------------------------------------------
--- 8.3 Task Runner (Overseer.nvim)
+-- 8.3 Task Runner (native :make + terminal)
 -- ---------------------------------------------------------------------------
 
-map('n', '<leader>ot', '<cmd>OverseerToggle<CR>', { desc = 'Task: Toggle' })
-map('n', '<leader>or', '<cmd>OverseerRun<CR>', { desc = 'Task: Run' })
-map('n', '<leader>oo', '<cmd>OverseerOpen<CR>', { desc = 'Task: Open' })
-map('n', '<leader>oc', '<cmd>OverseerClose<CR>', { desc = 'Task: Close' })
-map('n', '<leader>oq', '<cmd>OverseerQuickAction<CR>', { desc = 'Task: Quick action' })
-map('n', '<leader>oa', '<cmd>OverseerTaskAction<CR>', { desc = 'Task: Actions' })
-map('n', '<leader>ob', '<cmd>OverseerBuild<CR>', { desc = 'Task: Build' })
-map('n', '<leader>oi', '<cmd>OverseerInfo<CR>', { desc = 'Task: Info' })
+map('n', '<leader>om', '<cmd>make<CR>', { desc = 'Task: Run make' })
+map('n', '<leader>ob', '<cmd>make build<CR>', { desc = 'Task: Build' })
+map('n', '<leader>ot', '<cmd>make test<CR>', { desc = 'Task: Test' })
 
 -- ---------------------------------------------------------------------------
 -- 8.5 Markdown (Markdown Preview & Helpers)
 -- ---------------------------------------------------------------------------
 
-map('n', '<leader>mp', '<cmd>PeekOpen<CR>', { desc = 'Markdown: Preview open' })
-map('n', '<leader>mc', '<cmd>PeekClose<CR>', { desc = 'Markdown: Preview close' })
+-- Markdown preview via glow (brew install glow)
+map('n', '<leader>mp', function()
+  local file = vim.fn.expand '%:p'
+  if file == '' then
+    vim.notify('No file', vim.log.levels.WARN)
+    return
+  end
+  local buf = vim.api.nvim_create_buf(false, true)
+  local width = math.floor(vim.o.columns * 0.8)
+  local height = math.floor(vim.o.lines * 0.8)
+  vim.api.nvim_open_win(buf, true, {
+    relative = 'editor',
+    style = 'minimal',
+    border = 'rounded',
+    width = width,
+    height = height,
+    row = math.floor((vim.o.lines - height) / 2),
+    col = math.floor((vim.o.columns - width) / 2),
+  })
+  vim.fn.termopen('glow ' .. vim.fn.shellescape(file))
+  map('n', 'q', '<cmd>close<CR>', { buffer = buf, desc = 'Close preview' })
+end, { desc = 'Markdown: Preview (glow)' })
 map('n', '<leader>mi', '<cmd>PasteImage<cr>', { desc = 'Markdown: Paste image' })
 
 -- Markdown-specific keymaps (buffer-local, activated on markdown files)
@@ -1106,15 +1145,28 @@ map({ 'i', 's' }, '<Tab>', function()
   if vim.snippet.active { direction = 1 } then
     return '<cmd>lua vim.snippet.jump(1)<CR>'
   end
+  if vim.fn.pumvisible() == 1 then
+    return '<C-n>'
+  end
+  -- In select mode without an active snippet, do nothing (avoid deleting selection)
+  if vim.api.nvim_get_mode().mode == 's' then
+    return '<Ignore>'
+  end
   return '<Tab>'
-end, { expr = true, desc = 'Snippet: Next or Tab' })
+end, { expr = true, desc = 'Snippet: Next / Completion: Next / Tab' })
 
 map({ 'i', 's' }, '<S-Tab>', function()
   if vim.snippet.active { direction = -1 } then
     return '<cmd>lua vim.snippet.jump(-1)<CR>'
   end
+  if vim.fn.pumvisible() == 1 then
+    return '<C-p>'
+  end
+  if vim.api.nvim_get_mode().mode == 's' then
+    return '<Ignore>'
+  end
   return '<S-Tab>'
-end, { expr = true, desc = 'Snippet: Prev or S-Tab' })
+end, { expr = true, desc = 'Snippet: Prev / Completion: Prev / S-Tab' })
 
 -- ---------------------------------------------------------------------------
 -- 8.7 LSP Setup (Buffer-local keymaps & features via LspAttach)
@@ -1133,72 +1185,77 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end
 
     -- Native LSP completion (Neovim 0.11+ - replaces blink.cmp)
-    vim.lsp.completion.enable(true, client.id, buf, { autotrigger = true })
+    -- Only enable for clients that actually support completion (e.g. not ruff)
+    if client:supports_method 'textDocument/completion' then
+      -- autotrigger=true fires on server triggerCharacters (e.g. '.', '(')
+      vim.lsp.completion.enable(true, client.id, buf, { autotrigger = true })
+      -- Also trigger when typing an identifier (autotrigger skips plain words)
+      -- Only trigger when cursor is inside a word of 2+ chars to avoid popup on
+      -- every keypress (which blocks mouse selection and makes <CR>/<Tab> jumpy)
+      vim.api.nvim_create_autocmd('TextChangedI', {
+        buffer = buf,
+        callback = function()
+          if vim.fn.pumvisible() == 1 then
+            return
+          end
+          local col = vim.fn.col '.' - 1
+          local line = vim.api.nvim_get_current_line()
+          local word = line:sub(1, col):match '[%w_]+$'
+          if word and #word >= 2 then
+            vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-x><C-o>', true, true, true), 'n', true)
+          end
+        end,
+      })
+      -- Manual trigger
+      vim.keymap.set('i', '<C-Space>', '<C-x><C-o>', { buffer = buf, desc = 'Trigger completion' })
+    end
 
     local opts = { buffer = buf, silent = true }
+    -- Shorthand: buffer-local LSP map with description
+    local lmap = function(mode, lhs, rhs, desc)
+      map(mode, lhs, rhs, vim.tbl_extend('force', opts, { desc = desc }))
+    end
 
     -- Navigation (fzf-lua pickers for multi-result LSP queries)
-    map('n', 'gd', function()
-      require('fzf-lua').lsp_definitions()
-    end, vim.tbl_extend('force', opts, { desc = 'Go to definition' }))
-    map('n', 'gD', vim.lsp.buf.declaration, vim.tbl_extend('force', opts, { desc = 'Go to declaration' }))
-    map('n', 'gy', function()
-      require('fzf-lua').lsp_typedefs()
-    end, vim.tbl_extend('force', opts, { desc = 'Go to type definition' }))
-    map('n', 'gO', function()
-      require('fzf-lua').lsp_document_symbols()
-    end, vim.tbl_extend('force', opts, { desc = 'Document symbols' }))
-    map('n', 'grr', function()
-      require('fzf-lua').lsp_references()
-    end, vim.tbl_extend('force', opts, { desc = 'Find references' }))
-    map('n', 'gri', function()
-      require('fzf-lua').lsp_implementations()
-    end, vim.tbl_extend('force', opts, { desc = 'Go to implementation' }))
+    lmap('n', 'gd',  function() require('fzf-lua').lsp_definitions() end,       'Go to definition')
+    lmap('n', 'gD',  vim.lsp.buf.declaration,                                   'Go to declaration')
+    lmap('n', 'gy',  function() require('fzf-lua').lsp_typedefs() end,           'Go to type definition')
+    lmap('n', 'gO',  function() require('fzf-lua').lsp_document_symbols() end,   'Document symbols')
+    lmap('n', 'grr', function() require('fzf-lua').lsp_references() end,         'Find references')
+    lmap('n', 'gri', function() require('fzf-lua').lsp_implementations() end,    'Go to implementation')
 
     -- Diagnostics
-    map('n', '<leader>dd', vim.diagnostic.open_float, vim.tbl_extend('force', opts, { desc = 'Show diagnostics float' }))
-    map('n', '<leader>ql', vim.diagnostic.setloclist, vim.tbl_extend('force', opts, { desc = 'Diagnostics to loclist' }))
+    lmap('n', '<leader>dd', vim.diagnostic.open_float,  'Show diagnostics float')
+    lmap('n', '<leader>ql', vim.diagnostic.setloclist,  'Diagnostics to loclist')
 
-    -- Workspace & Call Hierarchy (fzf-lua pickers)
-    map('n', '<leader>ws', function()
-      require('fzf-lua').lsp_workspace_symbols()
-    end, vim.tbl_extend('force', opts, { desc = 'Workspace symbols' }))
-    map('n', '<leader>cI', function()
-      require('fzf-lua').lsp_incoming_calls()
-    end, vim.tbl_extend('force', opts, { desc = 'Incoming calls' }))
-    map('n', '<leader>co', function()
-      require('fzf-lua').lsp_outgoing_calls()
-    end, vim.tbl_extend('force', opts, { desc = 'Outgoing calls' }))
+    -- Workspace & Call Hierarchy
+    lmap('n', '<leader>ws', function() require('fzf-lua').lsp_workspace_symbols() end, 'Workspace symbols')
+    lmap('n', '<leader>cI', function() require('fzf-lua').lsp_incoming_calls() end,    'Incoming calls')
+    lmap('n', '<leader>co', function() require('fzf-lua').lsp_outgoing_calls() end,    'Outgoing calls')
 
-    -- Signature help in insert mode
-    map('i', '<C-k>', vim.lsp.buf.signature_help, vim.tbl_extend('force', opts, { desc = 'Signature help' }))
+    -- Signature help
+    lmap('i', '<C-k>', vim.lsp.buf.signature_help, 'Signature help')
 
-    -- Toggle inlay hints
-    map('n', '<leader>ih', function()
+    -- Inlay hints
+    lmap('n', '<leader>ih', function()
       vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = buf }, { bufnr = buf })
-    end, vim.tbl_extend('force', opts, { desc = 'Toggle inlay hints' }))
+    end, 'Toggle inlay hints')
 
-    -- Auto-enable inlay hints (if supported)
     if client:supports_method 'textDocument/inlayHint' then
       vim.lsp.inlay_hint.enable(true, { bufnr = buf })
     end
 
-    -- Code Lens: keymaps + auto-refresh (if supported)
+    -- Code Lens
     if client:supports_method 'textDocument/codeLens' then
-      map('n', '<leader>cl', vim.lsp.codelens.run, vim.tbl_extend('force', opts, { desc = 'Run code lens' }))
-      map('n', '<leader>cL', vim.lsp.codelens.refresh, vim.tbl_extend('force', opts, { desc = 'Refresh code lens' }))
-      vim.api.nvim_create_autocmd({ 'BufEnter', 'CursorHold', 'InsertLeave' }, {
+      lmap('n', '<leader>cl', vim.lsp.codelens.run,     'Run code lens')
+      lmap('n', '<leader>cL', vim.lsp.codelens.refresh, 'Refresh code lens')
+      vim.api.nvim_create_autocmd({ 'BufEnter', 'InsertLeave' }, {
         buffer = buf,
-        callback = function()
-          vim.lsp.codelens.refresh()
-        end,
+        callback = vim.lsp.codelens.refresh,
       })
     end
 
-    -- Semantic Tokens (Neovim 0.11+)
-    if client:supports_method 'textDocument/semanticTokens' then
-      vim.lsp.semantic_tokens.start(buf, client.id)
-    end
+    -- Note: semantic tokens are started automatically by Neovim 0.11+ on attach.
   end,
 })
 
@@ -1210,6 +1267,7 @@ map({ 'n', 'v' }, '<leader>cc', '<cmd>CodeCompanionChat Toggle<cr>', { desc = 'A
 map({ 'n', 'v' }, '<leader>ca', '<cmd>CodeCompanionActions<cr>', { desc = 'AI: Actions' })
 map({ 'n', 'v' }, '<leader>ci', '<cmd>CodeCompanion<cr>', { desc = 'AI: Inline Prompt' })
 map('v', '<leader>cx', '<cmd>CodeCompanionChat Add<cr>', { desc = 'AI: Add to Chat' })
+map('n', '<leader>cn', '<cmd>CodeCompanionChat<cr>', { desc = 'AI: New Chat' })
 
 -- Command abbreviation: type :cc in command mode to expand to CodeCompanion
 vim.cmd [[cab cc CodeCompanion]]
@@ -1223,14 +1281,19 @@ map('n', '<leader>lg', function()
   local w = math.floor(vim.o.columns * 0.92)
   local h = math.floor(vim.o.lines * 0.88)
   local win = vim.api.nvim_open_win(buf, true, {
-    relative = 'editor', style = 'minimal', border = 'rounded',
-    width = w, height = h,
+    relative = 'editor',
+    style = 'minimal',
+    border = 'rounded',
+    width = w,
+    height = h,
     row = math.floor((vim.o.lines - h) / 2),
     col = math.floor((vim.o.columns - w) / 2),
   })
   vim.fn.termopen('lazygit', {
     on_exit = function()
-      if vim.api.nvim_win_is_valid(win) then vim.api.nvim_win_close(win, true) end
+      if vim.api.nvim_win_is_valid(win) then
+        vim.api.nvim_win_close(win, true)
+      end
     end,
   })
   vim.cmd 'startinsert'
@@ -1253,7 +1316,9 @@ local function git_permalink(open, blame)
   remote = remote:gsub('%.git$', '')
   local rel = vim.fn.expand('%:p'):sub(#root + 2)
   local line1, line2 = vim.fn.line 'v', vim.fn.line '.'
-  if line1 > line2 then line1, line2 = line2, line1 end
+  if line1 > line2 then
+    line1, line2 = line2, line1
+  end
   local line_ref = line1 == line2 and ('#L' .. line1) or ('#L' .. line1 .. '-L' .. line2)
   local url = remote .. (blame and '/blame/' or '/blob/') .. commit .. '/' .. rel .. line_ref
   if open then
@@ -1264,18 +1329,30 @@ local function git_permalink(open, blame)
   end
 end
 
-map({ 'n', 'v' }, '<leader>gy', function() git_permalink(false, false) end, { desc = 'Yank git permalink' })
-map({ 'n', 'v' }, '<leader>gY', function() git_permalink(true, false) end, { desc = 'Open git permalink' })
-map({ 'n', 'v' }, '<leader>gb', function() git_permalink(false, true) end, { desc = 'Yank git blame link' })
-map({ 'n', 'v' }, '<leader>gB', function() git_permalink(true, true) end, { desc = 'Open git blame' })
+map({ 'n', 'v' }, '<leader>gy', function()
+  git_permalink(false, false)
+end, { desc = 'Yank git permalink' })
+map({ 'n', 'v' }, '<leader>gY', function()
+  git_permalink(true, false)
+end, { desc = 'Open git permalink' })
+map({ 'n', 'v' }, '<leader>gb', function()
+  git_permalink(false, true)
+end, { desc = 'Yank git blame link' })
+map({ 'n', 'v' }, '<leader>gB', function()
+  git_permalink(true, true)
+end, { desc = 'Open git blame' })
 
 -- ---------------------------------------------------------------------------
 -- 8.12 TODO Comments (Native - replaces todo-comments.nvim)
 -- ---------------------------------------------------------------------------
 
 local _todo_pat = [[\v<(TODO|FIXME|HACK|WARN|BUG|NOTE|PERF|TEST):]]
-map('n', ']T', function() vim.fn.search(_todo_pat, 'W') end, { desc = 'Next TODO' })
-map('n', '[T', function() vim.fn.search(_todo_pat, 'Wb') end, { desc = 'Prev TODO' })
+map('n', ']T', function()
+  vim.fn.search(_todo_pat, 'W')
+end, { desc = 'Next TODO' })
+map('n', '[T', function()
+  vim.fn.search(_todo_pat, 'Wb')
+end, { desc = 'Prev TODO' })
 map('n', '<leader>ft', '<cmd>FzfLua grep { search = "TODO:|FIXME:|HACK:|WARN:|PERF:|NOTE:|TEST:" }<CR>', { desc = 'Find TODOs (fzf)' })
 
 -- ---------------------------------------------------------------------------
@@ -1330,18 +1407,14 @@ function _G.gitsigns_on_attach(bufnr)
   bmap('n', '<leader>hS', gs.stage_buffer, 'Stage buffer')
   bmap('n', '<leader>hu', gs.undo_stage_hunk, 'Undo stage hunk')
   bmap('n', '<leader>hp', gs.preview_hunk, 'Preview hunk')
-  bmap('n', '<leader>hb', function() gs.blame_line { full = true } end, 'Blame line')
+  bmap('n', '<leader>hb', function()
+    gs.blame_line { full = true }
+  end, 'Blame line')
   bmap('n', '<leader>hd', gs.diffthis, 'Diff this')
-  bmap('n', '<leader>hB', function() gs.toggle_current_line_blame() end, 'Toggle line blame')
+  bmap('n', '<leader>hB', function()
+    gs.toggle_current_line_blame()
+  end, 'Toggle line blame')
 end
-
--- ---------------------------------------------------------------------------
--- 8.17 Linting (nvim-lint)
--- ---------------------------------------------------------------------------
-
-map('n', '<leader>xL', function()
-  require('lint').try_lint()
-end, { desc = 'Lint current file' })
 
 -- ============================================================================
 -- END OF KEYMAPS
@@ -1352,7 +1425,7 @@ end, { desc = 'Lint current file' })
 -- Pre-defined macros are in lua/core/macros.lua.
 -- LSP server configs and diagnostics are in lua/plugins/language.lua.
 -- Treesitter text objects are in lua/notemd/tree-sitter.lua.
--- Plugin-internal keymaps (Oil, Overseer, DAP UI, mkdnflow
+-- Plugin-internal keymaps (Oil, DAP UI, mkdnflow
 -- buffers) stay in their respective plugin files.
 -- Gitsigns on_attach keymaps are defined here (Section 8.16) and referenced
 -- from lua/plugins/git-signs.lua.

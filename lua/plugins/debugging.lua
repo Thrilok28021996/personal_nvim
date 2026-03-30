@@ -22,7 +22,7 @@ return {
         repl = 'r',
         toggle = 't',
       },
-      expand_lines = true, -- Always true in Neovim 0.11+
+      expand_lines = true,
       layouts = {
         {
           elements = {
@@ -90,7 +90,7 @@ return {
           return variable.name .. ' = ' .. variable.value
         end
       end,
-      virt_text_pos = 'inline', -- Always inline in Neovim 0.11+
+      virt_text_pos = 'inline',
       all_frames = false,
       virt_lines = false,
       virt_text_win_col = nil,
@@ -159,11 +159,14 @@ return {
     dap.configurations.typescript = dap.configurations.javascript
 
     -- C/C++ debugging using codelldb
+    -- Resolves to system install (brew install codelldb) or mason fallback
+    local codelldb_cmd = vim.fn.exepath 'codelldb' ~= '' and vim.fn.exepath 'codelldb'
+      or vim.fn.stdpath 'data' .. '/mason/packages/codelldb/extension/adapter/codelldb'
     dap.adapters.codelldb = {
       type = 'server',
       port = '${port}',
       executable = {
-        command = vim.fn.stdpath 'data' .. '/mason/packages/codelldb/extension/adapter/codelldb',
+        command = codelldb_cmd,
         args = { '--port', '${port}' },
       },
     }
@@ -197,10 +200,11 @@ return {
     -- Share C++ config with C
     dap.configurations.c = dap.configurations.cpp
 
-    -- Bash debugging
+    -- Bash debugging (mason-installed only)
+    local mason_pkg = vim.fn.stdpath 'data' .. '/mason/packages'
     dap.adapters.bashdb = {
       type = 'executable',
-      command = vim.fn.stdpath 'data' .. '/mason/packages/bash-debug-adapter/bash-debug-adapter',
+      command = mason_pkg .. '/bash-debug-adapter/bash-debug-adapter',
       name = 'bashdb',
     }
 
@@ -210,8 +214,8 @@ return {
         request = 'launch',
         name = 'Launch file',
         showDebugOutput = true,
-        pathBashdb = vim.fn.stdpath 'data' .. '/mason/packages/bash-debug-adapter/extension/bashdb_dir/bashdb',
-        pathBashdbLib = vim.fn.stdpath 'data' .. '/mason/packages/bash-debug-adapter/extension/bashdb_dir',
+        pathBashdb    = mason_pkg .. '/bash-debug-adapter/extension/bashdb_dir/bashdb',
+        pathBashdbLib = mason_pkg .. '/bash-debug-adapter/extension/bashdb_dir',
         trace = true,
         file = '${file}',
         program = '${file}',

@@ -37,7 +37,7 @@ end
 vim.opt.foldtext = 'v:lua.custom_foldtext()'
 
 -- Native Completion (Neovim 0.11+)
-vim.opt.completeopt = { 'menu', 'menuone', 'noselect', 'fuzzy' }
+vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
 
 -- Command-line completion enhancements (0.11+)
 vim.opt.wildmenu = true
@@ -53,7 +53,6 @@ vim.opt.wildignore = {
 
 -- Auto-save on buffer switch/window leave (0.11+)
 vim.opt.autowrite = true
-vim.opt.autowriteall = false -- Don't save on suspend
 
 -- Status column for unified left-side UI (0.11+)
 -- Shows line numbers, fold markers, and signs in one column
@@ -164,7 +163,6 @@ vim.api.nvim_create_autocmd('BufReadPost', {
 vim.opt.viewoptions = 'cursor,folds,slash,unix'
 vim.api.nvim_create_autocmd('BufWinLeave', {
   group = augroup,
-  pattern = '*.*',
   callback = function()
     if vim.bo.buftype == '' and vim.fn.expand '%' ~= '' then
       vim.cmd 'silent! mkview'
@@ -174,7 +172,6 @@ vim.api.nvim_create_autocmd('BufWinLeave', {
 
 vim.api.nvim_create_autocmd('BufWinEnter', {
   group = augroup,
-  pattern = '*.*',
   callback = function()
     if vim.bo.buftype == '' and vim.fn.expand '%' ~= '' then
       vim.cmd 'silent! loadview'
@@ -190,58 +187,30 @@ vim.api.nvim_create_autocmd('FocusLost', {
   end,
 })
 
--- Cursor word highlight (LSP document highlight + fallback)
-local word_match_id = nil
+-- Note: LSP document highlight (CursorHold/CursorMoved) is handled natively
+-- by Neovim 0.11+ via vim.lsp.document_color and built-in LspAttach handlers.
 
-vim.api.nvim_create_autocmd('CursorHold', {
-  group = augroup,
-  callback = function()
-    local clients = vim.lsp.get_clients { bufnr = 0 }
-    local has_highlight = false
-    for _, client in ipairs(clients) do
-      if client.supports_method 'textDocument/documentHighlight' then
-        has_highlight = true
-        break
-      end
-    end
-    if has_highlight then
-      vim.lsp.buf.document_highlight()
-    elseif #clients == 0 then
-      if word_match_id then
-        pcall(vim.fn.matchdelete, word_match_id)
-      end
-      word_match_id = vim.fn.matchadd('Search', '\\<' .. vim.fn.expand '<cword>' .. '\\>')
-    end
-  end,
-})
-
-vim.api.nvim_create_autocmd('CursorMoved', {
-  group = augroup,
-  callback = function()
-    local clients = vim.lsp.get_clients { bufnr = 0 }
-    local has_highlight = false
-    for _, client in ipairs(clients) do
-      if client.supports_method 'textDocument/documentHighlight' then
-        has_highlight = true
-        break
-      end
-    end
-    if has_highlight then
-      vim.lsp.buf.clear_references()
-    elseif word_match_id then
-      pcall(vim.fn.matchdelete, word_match_id)
-      word_match_id = nil
-    end
-  end,
-})
+-- Native image paste (replaces img-clip.nvim) — requires: brew install pngpaste
+vim.api.nvim_create_user_command('PasteImage', function()
+  local img_dir = vim.fn.expand '%:p:h' .. '/assets'
+  vim.fn.mkdir(img_dir, 'p')
+  local name = os.date '%Y%m%d_%H%M%S' .. '.png'
+  local path = img_dir .. '/' .. name
+  vim.fn.system('pngpaste ' .. vim.fn.shellescape(path))
+  if vim.v.shell_error ~= 0 then
+    vim.notify('No image in clipboard (brew install pngpaste)', vim.log.levels.WARN)
+    return
+  end
+  vim.api.nvim_put({ '![](assets/' .. name .. ')' }, 'c', true, true)
+  vim.notify('Pasted: assets/' .. name, vim.log.levels.INFO)
+end, { desc = 'Paste image from clipboard' })
 
 -- Native TODO highlights (replaces todo-comments.nvim)
 vim.api.nvim_create_autocmd('BufWinEnter', {
   group = augroup,
   callback = function()
-    for _, m in ipairs(vim.fn.getmatches()) do
-      if m.pattern and m.pattern:find('TODO', 1, true) then return end
-    end
+    if vim.b.todo_highlights_added then return end
+    vim.b.todo_highlights_added = true
     vim.fn.matchadd('DiagnosticWarn', [[\v<(TODO|FIXME|HACK|WARN|BUG|XXX):]])
     vim.fn.matchadd('DiagnosticInfo',  [[\v<(NOTE|INFO|PERF|OPTIMIZE):]])
     vim.fn.matchadd('DiagnosticHint',  [[\v<(TEST|TESTING):]])
@@ -277,7 +246,7 @@ end, { desc = 'Generate Markdown TOC' })
 
 vim.api.nvim_create_user_command('UpdateToc', function()
   local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-  local s, e
+  local s, e = nil, nil
   for i, line in ipairs(lines) do
     if line == '<!-- TOC -->' then s = i - 1
     elseif line == '<!-- /TOC -->' then e = i end
@@ -297,7 +266,7 @@ vim.api.nvim_create_autocmd('BufWritePre', {
   group = augroup,
   pattern = '*.md',
   callback = function()
-    for _, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, -1, false)) do
+    for _, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, 100, false)) do
       if line == '<!-- TOC -->' then vim.cmd 'UpdateToc' return end
     end
   end,
