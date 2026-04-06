@@ -2,7 +2,7 @@
 -- Loaded directly via require 'plugins.misc' in init.lua (before lazy.setup)
 
 -- ============================================================================
--- 1. STATUSLINE
+-- 1. STATUSLINE (uses 0.12+ vim.diagnostic.status / vim.ui.progress_status)
 -- ============================================================================
 
 function _G.statusline()
@@ -18,13 +18,18 @@ function _G.statusline()
   local readonly = vim.bo.readonly and ' [RO]' or ''
   local filetype = vim.bo.filetype ~= '' and ' [' .. vim.bo.filetype .. ']' or ''
 
-  -- Diagnostics (native)
-  local diag   = ''
-  local counts = vim.diagnostic.count(0)
-  local errors = counts[vim.diagnostic.severity.ERROR] or 0
-  local warns  = counts[vim.diagnostic.severity.WARN] or 0
-  if errors > 0 or warns > 0 then
-    diag = string.format(' E:%d W:%d', errors, warns)
+  -- Diagnostics (0.12+ vim.diagnostic.status)
+  local diag = vim.diagnostic.status and vim.diagnostic.status() or ''
+  if diag == '' then
+    -- Fallback: manual count
+    local counts = vim.diagnostic.count(0)
+    local errors = counts[vim.diagnostic.severity.ERROR] or 0
+    local warns  = counts[vim.diagnostic.severity.WARN] or 0
+    if errors > 0 or warns > 0 then
+      diag = string.format(' E:%d W:%d', errors, warns)
+    end
+  else
+    diag = ' ' .. diag
   end
 
   -- Git branch + diff stats (via gitsigns)
@@ -41,6 +46,10 @@ function _G.statusline()
   local clients = vim.lsp.get_clients { bufnr = 0 }
   if #clients > 0 then lsp = ' LSP:' .. clients[1].name end
 
+  -- Progress status (0.12+ — shows LSP indexing, etc.)
+  local progress = vim.ui.progress_status and vim.ui.progress_status() or ''
+  if progress ~= '' then progress = ' ' .. progress end
+
   -- Python venv
   local venv  = vim.env.VIRTUAL_ENV and (' ' .. vim.fs.basename(vim.env.VIRTUAL_ENV)) or ''
   local line  = vim.fn.line '.'
@@ -48,8 +57,8 @@ function _G.statusline()
   local total = vim.fn.line '$'
 
   return string.format(
-    ' %s │ %s%s%s%s%s%s%s%s │ %d:%d │ %d%% ',
-    mode, filename, modified, readonly, filetype, diag, branch, lsp, venv,
+    ' %s │ %s%s%s%s%s%s%s%s%s │ %d:%d │ %d%% ',
+    mode, filename, modified, readonly, filetype, diag, branch, lsp, progress, venv,
     line, col, math.floor(line / total * 100)
   )
 end

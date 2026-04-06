@@ -1,4 +1,4 @@
--- Core Neovim Options
+-- Core Neovim Options (Neovim 0.12+)
 
 -- Prepend Mason bin to PATH early so LSP servers installed via Mason are found
 vim.env.PATH = vim.fn.stdpath 'data' .. '/mason/bin:' .. vim.env.PATH
@@ -16,14 +16,18 @@ vim.opt.signcolumn = 'yes'
 vim.opt.scrolloff = 10
 vim.opt.sidescrolloff = 8
 
--- Window borders (Neovim 0.11+)
+-- Window borders (Neovim 0.11+, 0.12+ adds 'bold' style)
 -- Default border for all floating windows
 vim.o.winborder = 'rounded'
+
+-- Progress messages in cmdline (0.12+)
+vim.opt.messagesopt = 'hit-enter,history:500,progress:c'
 
 -- Native Folding (Neovim 0.10+)
 vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.opt.foldcolumn = '1' -- Show fold column for better visibility
+vim.opt.fillchars:append { foldinner = ' ' } -- Clean fold inner fill (0.12+)
 vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 99
 vim.opt.foldenable = true
@@ -36,8 +40,11 @@ function _G.custom_foldtext()
 end
 vim.opt.foldtext = 'v:lua.custom_foldtext()'
 
--- Native Completion (Neovim 0.11+)
-vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+-- Native Completion (Neovim 0.12+)
+vim.opt.completeopt = { 'menu', 'menuone', 'noselect', 'popup', 'nearest' }
+vim.opt.autocomplete = true -- Native auto-completion (0.12+)
+vim.opt.pumborder = 'rounded' -- Border for completion popup (0.12+)
+vim.opt.pummaxwidth = 60 -- Max width of completion popup (0.12+)
 
 -- Command-line completion enhancements (0.11+)
 vim.opt.wildmenu = true
@@ -85,6 +92,13 @@ vim.opt.incsearch = true
 vim.opt.grepprg = 'rg --vimgrep --smart-case'
 vim.opt.grepformat = '%f:%l:%c:%m'
 
+-- Diff (0.12+ inline character-level highlighting — default includes indent-heuristic)
+vim.opt.diffopt:append { 'inline:char' }
+
+-- Quickfix/location list stack size (0.12+)
+vim.opt.chistory = 20
+vim.opt.lhistory = 20
+
 -- Performance
 vim.opt.updatetime = 250
 vim.opt.timeoutlen = 300
@@ -95,7 +109,7 @@ vim.opt.splitbelow = true
 
 -- Display
 vim.opt.list = true
-vim.opt.listchars = { tab = '│ ', trail = '·', extends = '›', precedes = '‹', nbsp = '␣' }
+vim.opt.listchars = { tab = '│ ', leadtab = '│ ', trail = '·', extends = '›', precedes = '‹', nbsp = '␣' }
 vim.opt.inccommand = 'split'
 vim.opt.wrap = false
 
@@ -106,8 +120,13 @@ vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
 
 -- Native project root auto-cd (replaces project.nvim)
--- Uses vim.fs.root() (0.10+) to detect project root and cd into it
-local _root_patterns = { '.git', 'Makefile', 'package.json', 'setup.py', 'pyproject.toml', 'Cargo.toml', 'go.mod', 'CMakeLists.txt', 'compile_commands.json' }
+-- Uses vim.fs.root() (0.10+, 0.12+ equal-priority via nested lists)
+-- Nested list = equal priority group; first match wins within group
+local _root_patterns = {
+  { '.git' },  -- VCS root (highest priority)
+  { 'pyproject.toml', 'Cargo.toml', 'go.mod', 'package.json' },  -- Language roots (equal priority)
+  { 'Makefile', 'CMakeLists.txt', 'compile_commands.json', 'setup.py' },  -- Build systems
+}
 vim.api.nvim_create_autocmd('BufEnter', {
   group = vim.api.nvim_create_augroup('ProjectRootCd', { clear = true }),
   callback = function()

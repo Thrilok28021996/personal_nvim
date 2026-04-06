@@ -1,4 +1,4 @@
--- Pure Native LSP Configuration (Neovim 0.11+)
+-- Pure Native LSP Configuration (Neovim 0.11+/0.12+)
 -- No plugins required - uses vim.lsp.config and vim.lsp.enable
 
 -- ============================================================================
@@ -106,6 +106,8 @@ vim.diagnostic.config {
   float = {
     border = 'rounded',
     source = true,
+    -- 0.12+: DiagnosticRelatedInformation shown in float
+    -- gf in diagnostic float jumps to related locations
   },
   signs = {
     text = {
@@ -114,6 +116,7 @@ vim.diagnostic.config {
       [vim.diagnostic.severity.HINT] = '󰌶',
       [vim.diagnostic.severity.INFO] = '󰋽',
     },
+    -- 0.12 breaking: signs can no longer be configured via :sign-define
   },
   underline = true,
   update_in_insert = false,
@@ -123,11 +126,13 @@ vim.diagnostic.config {
 -- ============================================================================
 -- Enable LSP servers
 -- ============================================================================
--- LspAttach (keymaps, inlay hints, codelens, semantic tokens) is in
--- lua/core/keymaps.lua Section 8.7
+-- LspAttach (keymaps, inlay hints, codelens, document color, linked editing,
+-- semantic tokens) is in lua/core/keymaps.lua Section 8.7
 --
--- vim.lsp.enable must be called at the top level (not inside FileType autocmds)
--- so the servers auto-start when matching filetypes are first opened.
+-- 0.12+: vim.lsp.enable() now starts/stops clients as necessary and detaches
+-- non-applicable LSP clients automatically.
+-- Use :lsp to interactively manage clients, :checkhealth vim.lsp for status.
+-- Code lenses now display as virtual lines (not just virtual text).
 vim.lsp.enable({ 'pyright', 'clangd', 'lua_ls', 'cmake', 'ruff' })
 
 -- Return empty table (no plugin needed)
