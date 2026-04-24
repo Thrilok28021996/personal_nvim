@@ -18,19 +18,9 @@ function _G.statusline()
   local readonly = vim.bo.readonly and ' [RO]' or ''
   local filetype = vim.bo.filetype ~= '' and ' [' .. vim.bo.filetype .. ']' or ''
 
-  -- Diagnostics (0.12+ vim.diagnostic.status)
-  local diag = vim.diagnostic.status and vim.diagnostic.status() or ''
-  if diag == '' then
-    -- Fallback: manual count
-    local counts = vim.diagnostic.count(0)
-    local errors = counts[vim.diagnostic.severity.ERROR] or 0
-    local warns  = counts[vim.diagnostic.severity.WARN] or 0
-    if errors > 0 or warns > 0 then
-      diag = string.format(' E:%d W:%d', errors, warns)
-    end
-  else
-    diag = ' ' .. diag
-  end
+  -- Diagnostics
+  local diag = vim.diagnostic.status()
+  diag = diag ~= '' and (' ' .. diag) or ''
 
   -- Git branch + diff stats (via gitsigns)
   local branch = ''
@@ -46,9 +36,9 @@ function _G.statusline()
   local clients = vim.lsp.get_clients { bufnr = 0 }
   if #clients > 0 then lsp = ' LSP:' .. clients[1].name end
 
-  -- Progress status (0.12+ — shows LSP indexing, etc.)
-  local progress = vim.ui.progress_status and vim.ui.progress_status() or ''
-  if progress ~= '' then progress = ' ' .. progress end
+  -- LSP progress
+  local progress = vim.ui.progress_status()
+  progress = progress ~= '' and (' ' .. progress) or ''
 
   -- Python venv
   local venv  = vim.env.VIRTUAL_ENV and (' ' .. vim.fs.basename(vim.env.VIRTUAL_ENV)) or ''
@@ -162,8 +152,3 @@ end
 
 setup_autopairs()
 
--- ============================================================================
--- 4. INDENT GUIDES
--- ============================================================================
-
-vim.fn.matchadd('Whitespace', [[\(^\s\+\)]], 10)

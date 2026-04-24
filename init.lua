@@ -32,6 +32,7 @@ require('lazy').setup {
 
   -- AI
   require 'plugins.codecompanion',
+  require 'plugins.minuet',
 
   -- Markdown
   require 'notemd.tree-sitter',

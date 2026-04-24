@@ -3,8 +3,6 @@ return {
   ---@module 'oil'
   ---@type oil.SetupOpts
   opts = {
-    -- Removed 'icon' column to eliminate mini.icons dependency
-    -- Using native file type indicators instead
     columns = {
       'size',
     },
@@ -32,6 +30,5 @@ return {
       ['g\\'] = 'actions.toggle_trash',
     },
   },
-  -- Removed mini.icons dependency - using native file type detection
   lazy = false,
 }

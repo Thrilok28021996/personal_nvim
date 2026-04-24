@@ -14,15 +14,6 @@ return {
     -- Setup DAP UI
     dapui.setup {
       icons = { expanded = '▾', collapsed = '▸', current_frame = '▸' },
-      mappings = {
-        expand = { '<CR>', '<2-LeftMouse>' },
-        open = 'o',
-        remove = 'd',
-        edit = 'e',
-        repl = 'r',
-        toggle = 't',
-      },
-      expand_lines = true,
       layouts = {
         {
           elements = {
@@ -35,65 +26,30 @@ return {
           position = 'left',
         },
         {
-          elements = {
-            'repl',
-            'console',
-          },
+          elements = { 'repl', 'console' },
           size = 0.25,
           position = 'bottom',
         },
       },
       controls = {
-        enabled = true,
-        element = 'repl',
         icons = {
-          pause = '',
-          play = '',
-          step_into = '',
-          step_over = '',
-          step_out = '',
-          step_back = '',
-          run_last = '↻',
-          terminate = '□',
+          pause = '', play = '', step_into = '', step_over = '',
+          step_out = '', step_back = '', run_last = '↻', terminate = '□',
         },
       },
-      floating = {
-        max_height = nil,
-        max_width = nil,
-        border = 'single',
-        mappings = {
-          close = { 'q', '<Esc>' },
-        },
-      },
-      windows = { indent = 1 },
-      render = {
-        max_type_length = nil,
-        max_value_lines = 100,
-      },
+      floating = { border = 'rounded' },
     }
 
     -- Setup virtual text
     require('nvim-dap-virtual-text').setup {
-      enabled = true,
-      enabled_commands = true,
       highlight_changed_variables = true,
-      highlight_new_as_changed = false,
-      show_stop_reason = true,
-      commented = false,
-      only_first_definition = true,
-      all_references = false,
-      clear_on_continue = false,
-      display_callback = function(variable, buf, stackframe, node, options)
+      virt_text_pos = 'inline',
+      display_callback = function(variable, _, _, _, options)
         if options.virt_text_pos == 'inline' then
           return ' = ' .. variable.value
-        else
-          return variable.name .. ' = ' .. variable.value
         end
+        return variable.name .. ' = ' .. variable.value
       end,
-      virt_text_pos = 'inline',
-      all_frames = false,
-      virt_lines = false,
-      virt_text_win_col = nil,
     }
 
     -- Auto open/close DAP UI

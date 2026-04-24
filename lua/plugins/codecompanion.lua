@@ -10,12 +10,16 @@ return {
     -- Adapters
     -- =========================================================================
     adapters = {
-      ollama = function()
-        return require('codecompanion.adapters').extend('ollama', {
+      lmstudio = function()
+        return require('codecompanion.adapters').extend('openai_compatible', {
+          env = {
+            url     = 'http://localhost:1234',
+            api_key = 'lm-studio',
+          },
           schema = {
-            model       = { default = 'qwen2.5-coder:latest' },
-            num_ctx     = { default = 16384 },
+            model       = { default = 'qwen/qwen3.5-9b' },
             temperature = { default = 0 },
+            max_tokens  = { default = 4096 },
           },
         })
       end,
@@ -25,9 +29,9 @@ return {
     -- Strategies (aliased to interactions internally in v19+)
     -- =========================================================================
     strategies = {
-      chat   = { adapter = 'ollama' },
-      inline = { adapter = 'ollama' },
-      agent  = { adapter = 'ollama' },
+      chat   = { adapter = 'lmstudio' },
+      inline = { adapter = 'lmstudio' },
+      agent  = { adapter = 'lmstudio' },
     },
 
     -- =========================================================================
