@@ -3,7 +3,19 @@ return {
   lazy = false,
   name = 'catppuccin',
   priority = 1000,
-  config = function()
+  opts = {
+    integrations = {
+      treesitter    = true,
+      gitsigns      = true,
+      fzf           = true,
+      render_markdown = true,
+      dap           = true,
+      dap_ui        = true,
+      -- everything else disabled (navic, telescope, blink, nvimtree, etc.)
+    },
+  },
+  config = function(_, opts)
+    require('catppuccin').setup(opts)
     vim.cmd.colorscheme 'catppuccin-mocha'
 
     -- 0.12 new highlight groups — catppuccin doesn't define these yet,
