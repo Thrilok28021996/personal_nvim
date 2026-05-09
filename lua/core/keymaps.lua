@@ -216,16 +216,17 @@ map('n', '<leader>gd', '<cmd>windo diffthis<CR>', { desc = 'Enable diff mode' })
 map('n', '<leader>gD', '<cmd>windo diffoff<CR>',  { desc = 'Disable diff mode' })
 
 -- ── Debugging ────────────────────────────────────────────────────────────────
-map('n', '<leader>db', function() require('dap').toggle_breakpoint() end,                        { desc = 'Debug: Toggle breakpoint' })
-map('n', '<leader>dB', function() require('dap').set_breakpoint(vim.fn.input 'Condition: ') end, { desc = 'Debug: Conditional breakpoint' })
-map('n', '<leader>dc', function() require('dap').continue() end,                                 { desc = 'Debug: Continue' })
-map('n', '<leader>di', function() require('dap').step_into() end,                                { desc = 'Debug: Step into' })
-map('n', '<leader>do', function() require('dap').step_over() end,                                { desc = 'Debug: Step over' })
-map('n', '<leader>dO', function() require('dap').step_out() end,                                 { desc = 'Debug: Step out' })
-map('n', '<leader>dr', function() require('dap').repl.open() end,                                { desc = 'Debug: REPL' })
-map('n', '<leader>dl', function() require('dap').run_last() end,                                 { desc = 'Debug: Run last' })
-map('n', '<leader>dt', function() require('dap').terminate() end,                                { desc = 'Debug: Terminate' })
-map('n', '<leader>du', function() require('dapui').toggle() end,                                 { desc = 'Debug: Toggle UI' })
+local function _dap_setup() if _G._dap_ensure_setup then _G._dap_ensure_setup() end end
+map('n', '<leader>db', function() _dap_setup(); require('dap').toggle_breakpoint() end,                        { desc = 'Debug: Toggle breakpoint' })
+map('n', '<leader>dB', function() _dap_setup(); require('dap').set_breakpoint(vim.fn.input 'Condition: ') end, { desc = 'Debug: Conditional breakpoint' })
+map('n', '<leader>dc', function() _dap_setup(); require('dap').continue() end,                                 { desc = 'Debug: Continue' })
+map('n', '<leader>di', function() _dap_setup(); require('dap').step_into() end,                                { desc = 'Debug: Step into' })
+map('n', '<leader>do', function() _dap_setup(); require('dap').step_over() end,                                { desc = 'Debug: Step over' })
+map('n', '<leader>dO', function() _dap_setup(); require('dap').step_out() end,                                 { desc = 'Debug: Step out' })
+map('n', '<leader>dr', function() _dap_setup(); require('dap').repl.open() end,                                { desc = 'Debug: REPL' })
+map('n', '<leader>dl', function() _dap_setup(); require('dap').run_last() end,                                 { desc = 'Debug: Run last' })
+map('n', '<leader>dt', function() _dap_setup(); require('dap').terminate() end,                                { desc = 'Debug: Terminate' })
+map('n', '<leader>du', function() _dap_setup(); require('dapui').toggle() end,                                 { desc = 'Debug: Toggle UI' })
 
 -- ── Terminal ──────────────────────────────────────────────────────────────────
 map('n', '<C-t>',      '<cmd>terminal<CR>',          { desc = 'Open terminal' })
@@ -511,8 +512,6 @@ map('n', '<leader>fp', function()
   end)
 end, { desc = 'Recent projects' })
 
--- ── Plugin Manager ────────────────────────────────────────────────────────────
-map('n', '<leader>L',  '<cmd>Lazy<CR>', { desc = 'Plugin manager' })
 map('n', '<leader>li', '<cmd>lsp<CR>',  { desc = 'LSP manager' })
 
 -- ── Tasks ─────────────────────────────────────────────────────────────────────

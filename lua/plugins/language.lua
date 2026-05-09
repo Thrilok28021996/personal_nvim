@@ -134,6 +134,3 @@ vim.diagnostic.config {
 -- Use :lsp to interactively manage clients, :checkhealth vim.lsp for status.
 -- Code lenses now display as virtual lines (not just virtual text).
 vim.lsp.enable({ 'pyright', 'clangd', 'lua_ls', 'cmake', 'ruff' })
-
--- Return empty table (no plugin needed)
-return {}

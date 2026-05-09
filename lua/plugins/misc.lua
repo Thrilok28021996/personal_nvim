@@ -1,5 +1,4 @@
--- Native alternatives: statusline, tabline, auto-pairs, indent guides
--- Loaded directly via require 'plugins.misc' in init.lua (before lazy.setup)
+-- Native alternatives: statusline, tabline, auto-pairs
 
 -- ============================================================================
 -- 1. STATUSLINE (uses 0.12+ vim.diagnostic.status / vim.ui.progress_status)

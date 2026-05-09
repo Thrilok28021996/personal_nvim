@@ -17,6 +17,7 @@ vim.opt.scrolloff      = 10
 vim.opt.sidescrolloff  = 8
 vim.opt.winborder      = 'rounded'
 vim.opt.statuscolumn   = '%s%=%{v:relnum?v:relnum:v:lnum} '
+vim.opt.showtabline    = 2
 
 -- ── Messages ──────────────────────────────────────────────────────────────────
 vim.opt.messagesopt = 'hit-enter,history:500,progress:c'
