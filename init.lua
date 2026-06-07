@@ -155,8 +155,8 @@ vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
   callback = function()
     vim.cmd 'packadd gitsigns.nvim'
     require('gitsigns').setup {
-      signs        = { add = { text = '+' }, change = { text = '~' }, delete = { text = '_' }, topdelete = { text = '‾' }, changedelete = { text = '~' } },
-      signs_staged = { add = { text = '+' }, change = { text = '~' }, delete = { text = '_' }, topdelete = { text = '‾' }, changedelete = { text = '~' } },
+      signs        = { add = { text = '+' }, change = { text = '~' }, delete = { text = '_' }, topdelete = { text = '‾' }, changedelete = { text = '~' }, untracked = { text = '?' } },
+      signs_staged = { add = { text = '+' }, change = { text = '~' }, delete = { text = '_' }, topdelete = { text = '‾' }, changedelete = { text = '~' }, untracked = { text = '?' } },
       on_attach = function(bufnr)
         if _G.gitsigns_on_attach then _G.gitsigns_on_attach(bufnr) end
       end,
