@@ -229,11 +229,11 @@ vim.api.nvim_create_autocmd('FileType', {
   callback = function()
     vim.cmd 'packadd mkdnflow.nvim'
     require('mkdnflow').setup {
-      modules     = { bib = true, buffers = true, conceal = true, cursor = true, folds = false, links = true, lists = true, maps = true, paths = true, tables = true, yaml = false },
-      create_dirs = true,
-      perspective = { priority = 'first', fallback = 'current', root_tell = false, nvim_wd_heel = false, update = false },
-      links       = { style = 'markdown', name_is_source = false, conceal = false, context = 0, implicit_extension = nil, transform_implicit = false,
-        transform_explicit = function(t) return t:gsub(' ', '-'):lower() end,
+      modules         = { bib = true, buffers = true, conceal = true, cursor = true, folds = false, foldtext = false, links = true, lists = true, maps = true, paths = true, tables = true, templates = false, to_do = true, yaml = false, completion = false },
+      create_dirs     = true,
+      path_resolution = { primary = 'first', fallback = 'current', root_marker = false, sync_cwd = false, update_on_navigate = false },
+      links           = { style = 'markdown', conceal = false, search_range = 0, implicit_extension = nil, transform_on_follow = false,
+        transform_on_create = function(t) return t:gsub(' ', '-'):lower() end,
       },
       to_do = {
         statuses     = { not_started = { marker = ' ' }, in_progress = { marker = '-' }, complete = { marker = 'X' } },
@@ -254,7 +254,11 @@ vim.api.nvim_create_autocmd('FileType', {
         MkdnNewListItem = false, MkdnExtendList = false, MkdnUpdateNumbering = false,
         MkdnTableNextRow = false, MkdnTablePrevRow = false, MkdnTableNewRowBelow = false,
         MkdnTableNewRowAbove = false, MkdnTableNewColAfter = false, MkdnTableNewColBefore = false,
+        MkdnTableDeleteRow = false, MkdnTableDeleteCol = false,
         MkdnFoldSection = false, MkdnUnfoldSection = false,
+        MkdnNextHeadingSame = false, MkdnPrevHeadingSame = false,
+        MkdnIncreaseHeadingOp = false, MkdnDecreaseHeadingOp = false,
+        MkdnIndentListItem = false, MkdnDedentListItem = false,
       },
     }
   end,
