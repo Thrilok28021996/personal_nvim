@@ -93,7 +93,7 @@ vim.api.nvim_create_autocmd({ 'BufReadPost', 'BufNewFile' }, {
   callback = function()
     vim.cmd 'packadd nvim-treesitter-textobjects'
     vim.cmd 'packadd nvim-treesitter'
-    require('nvim-treesitter').setup {
+    require('nvim-treesitter.configs').setup {
       ensure_installed = {
         'c', 'cpp', 'lua', 'vim', 'vimdoc', 'query',
         'markdown', 'python', 'bash', 'json', 'yaml', 'toml', 'cmake', 'make',
