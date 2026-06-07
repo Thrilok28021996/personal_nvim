@@ -213,7 +213,7 @@ vim.api.nvim_create_autocmd('FileType', {
         icons       = { '󰲡 ', '󰲣 ', '󰲥 ', '󰲧 ', '󰲩 ', '󰲫 ' },
         backgrounds = { 'RenderMarkdownH1Bg', 'RenderMarkdownH2Bg', 'RenderMarkdownH3Bg', 'RenderMarkdownH4Bg', 'RenderMarkdownH5Bg', 'RenderMarkdownH6Bg' },
       },
-      code        = { enabled = true, sign = true, style = 'full', left_pad = 2, right_pad = 2, width = 'block', border = 'thin', highlight = 'RenderMarkdownCode', highlight_inline = 'RenderMarkdownCode' },
+      code        = { enabled = true, sign = true, style = 'full', left_pad = 2, right_pad = 2, width = 'block', border = 'thin', highlight = 'RenderMarkdownCode', highlight_inline = 'RenderMarkdownCodeInline' },
       bullet      = { enabled = true, icons = { '●', '○', '◆', '◇' }, highlight = 'RenderMarkdownBullet' },
       checkbox    = { enabled = true, unchecked = { icon = '󰄱 ' }, checked = { icon = '󰱒 ' } },
       quote       = { enabled = true, icon = '▋', highlight = { 'RenderMarkdownQuote1', 'RenderMarkdownQuote2', 'RenderMarkdownQuote3', 'RenderMarkdownQuote4', 'RenderMarkdownQuote5', 'RenderMarkdownQuote6' } },
