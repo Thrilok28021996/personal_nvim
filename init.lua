@@ -352,27 +352,29 @@ do
     vim.cmd 'packadd codecompanion.nvim'
     require('codecompanion').setup {
       adapters = {
-        lmstudio = function()
-          return require('codecompanion.adapters').extend('openai_compatible', {
-            env    = { url = 'http://localhost:1234', api_key = 'lm-studio' },
-            schema = { model = { default = 'qwen/qwen3.5-9b' }, temperature = { default = 0 }, max_tokens = { default = 4096 } },
-          })
-        end,
+        http = {
+          lmstudio = function()
+            return require('codecompanion.adapters').extend('openai_compatible', {
+              env    = { url = 'http://localhost:1234', api_key = 'lm-studio' },
+              schema = { model = { default = 'qwen/qwen3.5-9b' }, temperature = { default = 0 }, max_tokens = { default = 4096 } },
+            })
+          end,
+        },
       },
-      strategies = { chat = { adapter = 'lmstudio' }, inline = { adapter = 'lmstudio' }, agent = { adapter = 'lmstudio' } },
+      interactions = { chat = { adapter = 'lmstudio' }, inline = { adapter = 'lmstudio' }, cmd = { adapter = 'lmstudio' } },
       display = {
-        action_palette = { provider = 'fzf_lua', opts = { show_default_actions = true, show_default_prompt_library = true } },
+        action_palette = { provider = 'fzf_lua', opts = { show_preset_actions = true, show_preset_prompts = true } },
         chat = { window = { layout = 'vertical', width = 0.35, position = 'right', border = 'rounded' }, show_token_count = true, show_settings = false, render_headers = true, start_in_insert_mode = false, fold_context = true, auto_scroll = true },
         diff = { enabled = true, layout = 'vertical', provider = 'default' },
       },
       prompt_library = {
-        ['Explain Code']      = { strategy = 'chat',   description = 'Explain how the selected code works',             opts = { modes = { 'v' }, auto_submit = true, short_name = 'explain' }, prompts = { { role = 'user', content = function(ctx) local l = vim.list_slice(ctx.lines, ctx.start_line, ctx.end_line); return ('Explain this %s code step by step:\n\n```%s\n%s\n```'):format(ctx.filetype, ctx.filetype, table.concat(l, '\n')) end } } },
-        ['Fix Code']          = { strategy = 'chat',   description = 'Find and fix bugs in the selected code',          opts = { modes = { 'v' }, auto_submit = true, short_name = 'fix'     }, prompts = { { role = 'user', content = function(ctx) local l = vim.list_slice(ctx.lines, ctx.start_line, ctx.end_line); return ('Find and fix any bugs in this %s code. Show the corrected version:\n\n```%s\n%s\n```'):format(ctx.filetype, ctx.filetype, table.concat(l, '\n')) end } } },
-        ['Generate Tests']    = { strategy = 'chat',   description = 'Write unit tests for the selected code',          opts = { modes = { 'v' }, auto_submit = true, short_name = 'tests'   }, prompts = { { role = 'user', content = function(ctx) local l = vim.list_slice(ctx.lines, ctx.start_line, ctx.end_line); return ('Write comprehensive unit tests for this %s code:\n\n```%s\n%s\n```'):format(ctx.filetype, ctx.filetype, table.concat(l, '\n')) end } } },
-        ['Code Review']       = { strategy = 'chat',   description = 'Review code for issues, style, and improvements', opts = { modes = { 'v' }, auto_submit = true, short_name = 'review' }, prompts = { { role = 'user', content = function(ctx) local l = vim.list_slice(ctx.lines, ctx.start_line, ctx.end_line); return ('Review this %s code. Focus on: correctness, performance, readability, edge cases:\n\n```%s\n%s\n```'):format(ctx.filetype, ctx.filetype, table.concat(l, '\n')) end } } },
-        ['Add Docstring']     = { strategy = 'inline', description = 'Add a docstring to the selected function',        opts = { modes = { 'v' }, auto_submit = true, short_name = 'doc'     }, prompts = { { role = 'user', content = function(ctx) local l = vim.list_slice(ctx.lines, ctx.start_line, ctx.end_line); return ('Add a %s docstring to this function. Return only the code with the docstring added:\n\n```%s\n%s\n```'):format(ctx.filetype, ctx.filetype, table.concat(l, '\n')) end } } },
-        ['Git Commit']        = { strategy = 'chat',   description = 'Generate a git commit message for staged changes', opts = { auto_submit = true, short_name = 'commit' }, prompts = { { role = 'user', content = function() local d = vim.fn.system 'git diff --cached'; if d == '' then return 'No staged changes found.' end; return ('Write a concise conventional commit message for these staged changes:\n\n```diff\n%s\n```'):format(d) end } } },
-        ['Explain LSP Error'] = { strategy = 'chat',   description = 'Explain the LSP diagnostic under cursor',         opts = { auto_submit = true, short_name = 'lsp'    }, prompts = { { role = 'user', content = function(ctx) local diag = vim.diagnostic.get(ctx.bufnr, { lnum = vim.fn.line('.') - 1 }); if #diag == 0 then return 'No diagnostics on current line.' end; local msgs = vim.tbl_map(function(d) return d.message end, diag); return ('Explain this %s error and how to fix it:\n\n%s\n\nContext:\n```%s\n%s\n```'):format(ctx.filetype, table.concat(msgs, '\n'), ctx.filetype, vim.api.nvim_get_current_line()) end } } },
+        ['Explain Code']      = { strategy = 'chat',   description = 'Explain how the selected code works',             opts = { modes = { 'v' }, auto_submit = true, alias = 'explain' }, prompts = { { role = 'user', content = function(ctx) local l = vim.list_slice(ctx.lines, ctx.start_line, ctx.end_line); return ('Explain this %s code step by step:\n\n```%s\n%s\n```'):format(ctx.filetype, ctx.filetype, table.concat(l, '\n')) end } } },
+        ['Fix Code']          = { strategy = 'chat',   description = 'Find and fix bugs in the selected code',          opts = { modes = { 'v' }, auto_submit = true, alias = 'fix'     }, prompts = { { role = 'user', content = function(ctx) local l = vim.list_slice(ctx.lines, ctx.start_line, ctx.end_line); return ('Find and fix any bugs in this %s code. Show the corrected version:\n\n```%s\n%s\n```'):format(ctx.filetype, ctx.filetype, table.concat(l, '\n')) end } } },
+        ['Generate Tests']    = { strategy = 'chat',   description = 'Write unit tests for the selected code',          opts = { modes = { 'v' }, auto_submit = true, alias = 'tests'   }, prompts = { { role = 'user', content = function(ctx) local l = vim.list_slice(ctx.lines, ctx.start_line, ctx.end_line); return ('Write comprehensive unit tests for this %s code:\n\n```%s\n%s\n```'):format(ctx.filetype, ctx.filetype, table.concat(l, '\n')) end } } },
+        ['Code Review']       = { strategy = 'chat',   description = 'Review code for issues, style, and improvements', opts = { modes = { 'v' }, auto_submit = true, alias = 'review' }, prompts = { { role = 'user', content = function(ctx) local l = vim.list_slice(ctx.lines, ctx.start_line, ctx.end_line); return ('Review this %s code. Focus on: correctness, performance, readability, edge cases:\n\n```%s\n%s\n```'):format(ctx.filetype, ctx.filetype, table.concat(l, '\n')) end } } },
+        ['Add Docstring']     = { strategy = 'inline', description = 'Add a docstring to the selected function',        opts = { modes = { 'v' }, auto_submit = true, alias = 'doc'     }, prompts = { { role = 'user', content = function(ctx) local l = vim.list_slice(ctx.lines, ctx.start_line, ctx.end_line); return ('Add a %s docstring to this function. Return only the code with the docstring added:\n\n```%s\n%s\n```'):format(ctx.filetype, ctx.filetype, table.concat(l, '\n')) end } } },
+        ['Git Commit']        = { strategy = 'chat',   description = 'Generate a git commit message for staged changes', opts = { auto_submit = true, alias = 'commit' }, prompts = { { role = 'user', content = function() local d = vim.fn.system 'git diff --cached'; if d == '' then return 'No staged changes found.' end; return ('Write a concise conventional commit message for these staged changes:\n\n```diff\n%s\n```'):format(d) end } } },
+        ['Explain LSP Error'] = { strategy = 'chat',   description = 'Explain the LSP diagnostic under cursor',         opts = { auto_submit = true, alias = 'lsp'    }, prompts = { { role = 'user', content = function(ctx) local diag = vim.diagnostic.get(ctx.bufnr, { lnum = vim.fn.line('.') - 1 }); if #diag == 0 then return 'No diagnostics on current line.' end; local msgs = vim.tbl_map(function(d) return d.message end, diag); return ('Explain this %s error and how to fix it:\n\n%s\n\nContext:\n```%s\n%s\n```'):format(ctx.filetype, table.concat(msgs, '\n'), ctx.filetype, vim.api.nvim_get_current_line()) end } } },
       },
       opts = {
         log_level = 'ERROR',
