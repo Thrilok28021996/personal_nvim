@@ -289,7 +289,7 @@ do
       fzf_opts = { ['--layout'] = 'reverse' },
       winopts  = { height = 0.85, width = 0.80, row = 0.35, col = 0.50, preview = { layout = 'flex', flip_columns = 120 } },
       files    = { cmd = 'fd --type f --hidden --exclude .git' },
-      grep     = { rg_opts = '--column --line-number --no-heading --color=always --smart-case' },
+      grep     = { rg_opts = '--column --line-number --no-heading --color=always --smart-case --max-columns=4096 -e' },
     }
     fzf.register_ui_select()
   end
