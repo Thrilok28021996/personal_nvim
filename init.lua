@@ -41,10 +41,10 @@ vim.pack.add {
 vim.cmd 'packadd catppuccin'
 require('catppuccin').setup {
   integrations = {
-    treesitter      = true,
     gitsigns        = true,
     fzf             = true,
     render_markdown = true,
+    mason           = true,
     dap             = true,
     dap_ui          = true,
   },
